@@ -4,14 +4,14 @@ import { useRouter } from 'next/navigation'
 import { supabase, type Client } from '@/lib/supabase'
 
 const PLAN_COLORS: Record<string, string> = {
-  starter: '#00A550',
+  starter: '#22C55E',
   pro: '#FFD700',
   agency: '#8B5CF6',
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  active: '#00A550',
-  inactive: '#666',
+  active: '#22C55E',
+  inactive: '#555',
 }
 
 function slugify(name: string) {
@@ -127,7 +127,7 @@ export default function AdminPage() {
 
     const loginUrl = `${window.location.origin}/login?client=${form.slug || slugify(form.business_name)}`
     setSuccessClient({ name: form.business_name, loginUrl })
-    setForm({ business_name: '', client_name: '', email: '', plan: 'starter', site_url: '', slug: '', logo_letter: '', portal_color: '#00A550', portal_accent: '#FFD700' })
+    setForm({ business_name: '', client_name: '', email: '', plan: 'starter', site_url: '', slug: '', logo_letter: '', portal_color: '#0EA5E9', portal_accent: '#FFD700' })
     loadClients()
     setSaving(false)
   }
@@ -164,7 +164,7 @@ export default function AdminPage() {
 
   const fieldStyle = {
     width: '100%', boxSizing: 'border-box' as const,
-    background: '#1A1A1A', border: '1.5px solid rgba(255,255,255,0.1)',
+    background: '#0F1929', border: '1.5px solid rgba(255,255,255,0.1)',
     borderRadius: 10, padding: '12px 14px', color: '#fff', fontSize: 14, outline: 'none',
   }
   const labelStyle = {
@@ -174,15 +174,15 @@ export default function AdminPage() {
   }
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#0A0A0A', color: '#fff' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: '#070B14', color: '#fff' }}>
       {/* Sidebar */}
-      <div style={{ width: 240, background: '#111', borderRight: '1px solid rgba(255,255,255,0.07)', display: 'flex', flexDirection: 'column', padding: '24px 0', flexShrink: 0 }}>
+      <div style={{ width: 240, background: '#0D1525', borderRight: '1px solid rgba(255,255,255,0.07)', display: 'flex', flexDirection: 'column', padding: '24px 0', flexShrink: 0 }}>
         <div style={{ padding: '0 20px 32px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 36, height: 36, background: 'linear-gradient(135deg,#00A550,#007A3A)', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 15, boxShadow: '0 0 16px rgba(0,165,80,0.3)' }}>MJ</div>
+            <div style={{ width: 36, height: 36, background: 'linear-gradient(135deg,#0EA5E9,#0284C7)', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 15, boxShadow: '0 0 16px rgba(14,165,233,0.3)' }}>MJ</div>
             <div>
               <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: 0.5 }}>MJ AGENCY</div>
-              <div style={{ fontSize: 10, color: '#00A550', fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase' }}>Admin Panel</div>
+              <div style={{ fontSize: 10, color: '#0EA5E9', fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase' }}>Admin Panel</div>
             </div>
           </div>
         </div>
@@ -194,7 +194,7 @@ export default function AdminPage() {
             { icon: '📊', label: 'Analytics', active: false },
             { icon: '⚙️', label: 'Settings', active: false },
           ].map(item => (
-            <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 12px', borderRadius: 10, marginBottom: 4, background: item.active ? 'rgba(0,165,80,0.12)' : 'transparent', color: item.active ? '#00A550' : 'rgba(255,255,255,0.5)', fontSize: 14, fontWeight: item.active ? 600 : 400, cursor: 'pointer' }}>
+            <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 12px', borderRadius: 10, marginBottom: 4, background: item.active ? 'rgba(14,165,233,0.12)' : 'transparent', color: item.active ? '#0EA5E9' : 'rgba(255,255,255,0.5)', fontSize: 14, fontWeight: item.active ? 600 : 400, cursor: 'pointer' }}>
               <span style={{ fontSize: 16 }}>{item.icon}</span>
               {item.label}
             </div>
@@ -216,7 +216,7 @@ export default function AdminPage() {
             <h1 style={{ fontSize: 28, fontWeight: 800, marginBottom: 4, margin: 0 }}>Dashboard</h1>
             <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)', marginTop: 4 }}>Manage all client websites from one place</div>
           </div>
-          <button onClick={() => setShowModal(true)} style={{ background: 'linear-gradient(135deg,#00A550,#007A3A)', border: 'none', borderRadius: 12, padding: '12px 24px', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 16px rgba(0,165,80,0.35)' }}>
+          <button onClick={() => setShowModal(true)} style={{ background: 'linear-gradient(135deg,#0EA5E9,#0284C7)', border: 'none', borderRadius: 12, padding: '12px 24px', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 16px rgba(14,165,233,0.35)' }}>
             + Add Client
           </button>
         </div>
@@ -224,11 +224,11 @@ export default function AdminPage() {
         {/* Stats */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16, marginBottom: 32 }}>
           {[
-            { label: 'Total Clients', value: stats.total, icon: '👥', color: '#00A550' },
+            { label: 'Total Clients', value: stats.total, icon: '👥', color: '#0EA5E9' },
             { label: 'Active Sites', value: stats.active, icon: '🌐', color: '#FFD700' },
             { label: 'Pro / Agency', value: stats.pro, icon: '⭐', color: '#8B5CF6' },
           ].map(stat => (
-            <div key={stat.label} style={{ background: '#111', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 16, padding: '24px' }}>
+            <div key={stat.label} style={{ background: '#0D1525', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 16, padding: '24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
                   <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', fontWeight: 600, letterSpacing: 0.5, marginBottom: 8 }}>{stat.label}</div>
@@ -241,11 +241,11 @@ export default function AdminPage() {
         </div>
 
         {/* Client table */}
-        <div style={{ background: '#111', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 16, overflow: 'hidden' }}>
+        <div style={{ background: '#0D1525', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 16, overflow: 'hidden' }}>
           <div style={{ padding: '20px 24px', borderBottom: '1px solid rgba(255,255,255,0.07)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ fontSize: 16, fontWeight: 700 }}>All Clients</div>
             <input
-              style={{ background: '#1A1A1A', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: '9px 16px', color: '#fff', fontSize: 13, width: 220, outline: 'none' }}
+              style={{ background: '#0F1929', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: '9px 16px', color: '#fff', fontSize: 13, width: 220, outline: 'none' }}
               placeholder="Search clients…"
               value={search} onChange={e => setSearch(e.target.value)}
             />
@@ -275,7 +275,7 @@ export default function AdminPage() {
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                         <div style={{
                           width: 32, height: 32, borderRadius: 8, flexShrink: 0,
-                          background: `linear-gradient(135deg, ${client.portal_color || '#00A550'}, ${client.portal_color || '#00A550'}BB)`,
+                          background: `linear-gradient(135deg, ${client.portal_color || '#0EA5E9'}, ${client.portal_color || '#0EA5E9'}BB)`,
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                           fontSize: 14, fontWeight: 900, color: '#fff',
                         }}>
@@ -304,7 +304,7 @@ export default function AdminPage() {
                     </td>
                     <td style={{ padding: '16px 20px' }}>
                       {client.site_url ? (
-                        <a href={client.site_url} target="_blank" rel="noreferrer" style={{ color: '#00A550', fontSize: 13, textDecoration: 'none', fontWeight: 600 }}>View Site ↗</a>
+                        <a href={client.site_url} target="_blank" rel="noreferrer" style={{ color: '#0EA5E9', fontSize: 13, textDecoration: 'none', fontWeight: 600 }}>View Site ↗</a>
                       ) : (
                         <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: 13 }}>—</span>
                       )}
@@ -313,7 +313,7 @@ export default function AdminPage() {
                       <div style={{ display: 'flex', gap: 6 }}>
                         <button
                           onClick={() => router.push(`/editor?clientId=${client.id}`)}
-                          style={{ background: 'rgba(0,165,80,0.12)', border: '1px solid rgba(0,165,80,0.25)', borderRadius: 8, padding: '7px 12px', color: '#00A550', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
+                          style={{ background: 'rgba(14,165,233,0.12)', border: '1px solid rgba(14,165,233,0.25)', borderRadius: 8, padding: '7px 12px', color: '#0EA5E9', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
                         >
                           Edit
                         </button>
@@ -346,7 +346,7 @@ export default function AdminPage() {
           style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 20 }}
           onClick={e => e.target === e.currentTarget && setShowModal(false)}
         >
-          <div style={{ background: '#111', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 20, padding: '40px', width: '100%', maxWidth: 500, maxHeight: '90vh', overflowY: 'auto' }}>
+          <div style={{ background: '#0D1525', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 20, padding: '40px', width: '100%', maxWidth: 500, maxHeight: '90vh', overflowY: 'auto' }}>
             {successClient ? (
               /* Success Screen */
               <div style={{ textAlign: 'center' }}>
@@ -354,13 +354,13 @@ export default function AdminPage() {
                 <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 8 }}>{successClient.name} added!</div>
                 <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)', marginBottom: 32 }}>Send this login link to your client</div>
 
-                <div style={{ background: '#1A1A1A', border: '1px solid rgba(0,165,80,0.3)', borderRadius: 12, padding: '18px 20px', marginBottom: 20, wordBreak: 'break-all', fontSize: 13, color: '#00A550', fontFamily: 'monospace', textAlign: 'left' }}>
+                <div style={{ background: '#0F1929', border: '1px solid rgba(14,165,233,0.3)', borderRadius: 12, padding: '18px 20px', marginBottom: 20, wordBreak: 'break-all', fontSize: 13, color: '#0EA5E9', fontFamily: 'monospace', textAlign: 'left' }}>
                   {successClient.loginUrl}
                 </div>
 
                 <button
                   onClick={() => { navigator.clipboard.writeText(successClient.loginUrl); showToast('Login link copied!') }}
-                  style={{ width: '100%', background: 'linear-gradient(135deg,#00A550,#007A3A)', border: 'none', borderRadius: 10, padding: '14px', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', marginBottom: 12 }}
+                  style={{ width: '100%', background: 'linear-gradient(135deg,#0EA5E9,#0284C7)', border: 'none', borderRadius: 10, padding: '14px', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', marginBottom: 12 }}
                 >
                   Copy Login Link
                 </button>
@@ -416,7 +416,7 @@ export default function AdminPage() {
                       />
                     </div>
                     <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', marginTop: 5 }}>
-                      Client login URL: <span style={{ color: '#00A550' }}>/login?client={form.slug || 'slug'}</span>
+                      Client login URL: <span style={{ color: '#0EA5E9' }}>/login?client={form.slug || 'slug'}</span>
                     </div>
                   </div>
 
@@ -438,7 +438,7 @@ export default function AdminPage() {
 
                   {/* Preview */}
                   {(form.business_name || form.logo_letter) && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: '#0A0A0A', borderRadius: 10, padding: '12px 16px', marginBottom: 20, border: `1px solid ${form.portal_color}30` }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: '#070B14', borderRadius: 10, padding: '12px 16px', marginBottom: 20, border: `1px solid ${form.portal_color}30` }}>
                       <div style={{ width: 36, height: 36, borderRadius: 10, background: `linear-gradient(135deg, ${form.portal_color}, ${form.portal_color}BB)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 16, color: '#fff', flexShrink: 0, boxShadow: `0 0 16px ${form.portal_color}40` }}>
                         {form.logo_letter || form.business_name[0]?.toUpperCase() || '?'}
                       </div>
@@ -463,7 +463,7 @@ export default function AdminPage() {
                     <button type="button" onClick={() => setShowModal(false)} style={{ flex: 1, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: '13px', color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
                       Cancel
                     </button>
-                    <button type="submit" disabled={saving} style={{ flex: 2, background: 'linear-gradient(135deg,#00A550,#007A3A)', border: 'none', borderRadius: 10, padding: '13px', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 16px rgba(0,165,80,0.3)' }}>
+                    <button type="submit" disabled={saving} style={{ flex: 2, background: 'linear-gradient(135deg,#0EA5E9,#0284C7)', border: 'none', borderRadius: 10, padding: '13px', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 16px rgba(14,165,233,0.3)' }}>
                       {saving ? 'Creating…' : 'Create Client →'}
                     </button>
                   </div>
@@ -476,7 +476,7 @@ export default function AdminPage() {
 
       {/* Toast */}
       {toast && (
-        <div style={{ position: 'fixed', bottom: 28, right: 28, background: '#1A1A1A', border: '1px solid rgba(0,165,80,0.4)', borderRadius: 12, padding: '14px 22px', fontSize: 14, fontWeight: 600, zIndex: 2000, boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}>
+        <div style={{ position: 'fixed', bottom: 28, right: 28, background: '#0F1929', border: '1px solid rgba(14,165,233,0.4)', borderRadius: 12, padding: '14px 22px', fontSize: 14, fontWeight: 600, zIndex: 2000, boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}>
           {toast}
         </div>
       )}

@@ -8,7 +8,7 @@ const TABS = ['Branding', 'Hero', 'Products', 'About', 'Social'] as const
 type Tab = typeof TABS[number]
 
 const inp = (extra?: React.CSSProperties): React.CSSProperties => ({
-  width: '100%', background: '#1A1A1A', border: '1.5px solid rgba(255,255,255,0.1)',
+  width: '100%', background: '#0F1929', border: '1.5px solid rgba(14,165,233,0.15)',
   borderRadius: 10, padding: '12px 14px', color: '#fff', fontSize: 14,
   fontFamily: 'inherit', ...extra,
 })
@@ -119,32 +119,32 @@ function EditorInner() {
   }
 
   if (loading) return (
-    <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0A0A0A' }}>
-      <div style={{ width: 32, height: 32, border: '3px solid #00A550', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+    <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#070B14' }}>
+      <div style={{ width: 32, height: 32, border: '3px solid #0EA5E9', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
     </div>
   )
 
   return (
-    <div style={{ display: 'flex', height: '100vh', background: '#0A0A0A', overflow: 'hidden' }}>
+    <div style={{ display: 'flex', height: '100vh', background: '#070B14', overflow: 'hidden' }}>
       {/* Sidebar */}
-      <div style={{ width: 220, background: '#111', borderRight: '1px solid rgba(255,255,255,0.07)', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
+      <div style={{ width: 220, background: '#0D1525', borderRight: '1px solid rgba(255,255,255,0.07)', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
         <div style={{ padding: '20px 16px', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-            <div style={{ width: 32, height: 32, background: 'linear-gradient(135deg,#00A550,#007A3A)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 12 }}>MJ</div>
+            <div style={{ width: 32, height: 32, background: 'linear-gradient(135deg,#0EA5E9,#0284C7)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 12 }}>MJ</div>
             <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.5 }}>MJ AGENCY</div>
           </div>
           {client && (
-            <div style={{ background: 'rgba(0,165,80,0.1)', border: '1px solid rgba(0,165,80,0.2)', borderRadius: 8, padding: '10px 12px' }}>
+            <div style={{ background: 'rgba(14,165,233,0.1)', border: '1px solid rgba(14,165,233,0.2)', borderRadius: 8, padding: '10px 12px' }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>{client.business_name}</div>
-              <div style={{ fontSize: 11, color: '#00A550', fontWeight: 600, marginTop: 2, textTransform: 'capitalize' }}>{client.plan} plan</div>
+              <div style={{ fontSize: 11, color: '#0EA5E9', fontWeight: 600, marginTop: 2, textTransform: 'capitalize' }}>{client.plan} plan</div>
             </div>
           )}
         </div>
 
         <nav style={{ flex: 1, padding: '12px 8px', overflowY: 'auto' }}>
           {TABS.map(t => (
-            <button key={t} onClick={() => setTab(t)} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '11px 12px', borderRadius: 10, marginBottom: 3, background: tab === t ? 'rgba(0,165,80,0.12)' : 'transparent', color: tab === t ? '#00A550' : 'rgba(255,255,255,0.55)', fontSize: 14, fontWeight: tab === t ? 700 : 400, cursor: 'pointer', border: 'none', textAlign: 'left', fontFamily: 'inherit' }}>
+            <button key={t} onClick={() => setTab(t)} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '11px 12px', borderRadius: 10, marginBottom: 3, background: tab === t ? 'rgba(14,165,233,0.12)' : 'transparent', color: tab === t ? '#0EA5E9' : 'rgba(255,255,255,0.55)', fontSize: 14, fontWeight: tab === t ? 700 : 400, cursor: 'pointer', border: 'none', textAlign: 'left', fontFamily: 'inherit' }}>
               <span style={{ fontSize: 16 }}>
                 {t === 'Branding' ? '🎨' : t === 'Hero' ? '🏠' : t === 'Products' ? '📦' : t === 'About' ? '📖' : '🔗'}
               </span>
@@ -160,7 +160,7 @@ function EditorInner() {
             </button>
           )}
           {client?.site_url && (
-            <a href={client.site_url} target="_blank" rel="noreferrer" style={{ background: 'rgba(0,165,80,0.08)', border: '1px solid rgba(0,165,80,0.2)', borderRadius: 8, padding: '9px', color: '#00A550', fontSize: 12, fontWeight: 600, textAlign: 'center', textDecoration: 'none' }}>
+            <a href={client.site_url} target="_blank" rel="noreferrer" style={{ background: 'rgba(14,165,233,0.08)', border: '1px solid rgba(14,165,233,0.2)', borderRadius: 8, padding: '9px', color: '#0EA5E9', fontSize: 12, fontWeight: 600, textAlign: 'center', textDecoration: 'none' }}>
               View Live Site ↗
             </a>
           )}
@@ -170,7 +170,7 @@ function EditorInner() {
       {/* Content area */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {/* Top bar */}
-        <div style={{ background: '#111', borderBottom: '1px solid rgba(255,255,255,0.07)', padding: '16px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
+        <div style={{ background: '#0D1525', borderBottom: '1px solid rgba(255,255,255,0.07)', padding: '16px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
           <div>
             <div style={{ fontSize: 18, fontWeight: 800 }}>{tab}</div>
             <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>
@@ -181,7 +181,7 @@ function EditorInner() {
               {tab === 'Social' && 'Social media and contact links'}
             </div>
           </div>
-          <button onClick={saveContent} disabled={saving} style={{ background: 'linear-gradient(135deg,#00A550,#007A3A)', border: 'none', borderRadius: 10, padding: '12px 28px', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 16px rgba(0,165,80,0.3)' }}>
+          <button onClick={saveContent} disabled={saving} style={{ background: 'linear-gradient(135deg,#0EA5E9,#0284C7)', border: 'none', borderRadius: 10, padding: '12px 28px', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 16px rgba(14,165,233,0.3)' }}>
             {saving ? 'Saving…' : '✓ Save Changes'}
           </button>
         </div>
@@ -202,8 +202,8 @@ function EditorInner() {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                   <Field label="Primary Colour">
                     <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                      <input type="color" value={content.primary_color || '#00A550'} onChange={e => set('primary_color', e.target.value)} style={{ width: 48, height: 44, border: 'none', borderRadius: 8, cursor: 'pointer', background: 'transparent', padding: 2 }} />
-                      <input style={inp({ flex: 1 })} value={content.primary_color || ''} onChange={e => set('primary_color', e.target.value)} placeholder="#00A550" />
+                      <input type="color" value={content.primary_color || '#0EA5E9'} onChange={e => set('primary_color', e.target.value)} style={{ width: 48, height: 44, border: 'none', borderRadius: 8, cursor: 'pointer', background: 'transparent', padding: 2 }} />
+                      <input style={inp({ flex: 1 })} value={content.primary_color || ''} onChange={e => set('primary_color', e.target.value)} placeholder="#0EA5E9" />
                     </div>
                   </Field>
                   <Field label="Accent Colour">
@@ -213,10 +213,10 @@ function EditorInner() {
                     </div>
                   </Field>
                 </div>
-                <div style={{ background: 'rgba(0,165,80,0.07)', border: '1px solid rgba(0,165,80,0.15)', borderRadius: 12, padding: '16px 20px', marginTop: 8 }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: '#00A550', marginBottom: 8 }}>COLOUR PREVIEW</div>
+                <div style={{ background: 'rgba(14,165,233,0.07)', border: '1px solid rgba(14,165,233,0.15)', borderRadius: 12, padding: '16px 20px', marginTop: 8 }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#0EA5E9', marginBottom: 8 }}>COLOUR PREVIEW</div>
                   <div style={{ display: 'flex', gap: 12 }}>
-                    <div style={{ flex: 1, height: 48, borderRadius: 10, background: content.primary_color || '#00A550', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700 }}>Primary</div>
+                    <div style={{ flex: 1, height: 48, borderRadius: 10, background: content.primary_color || '#0EA5E9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700 }}>Primary</div>
                     <div style={{ flex: 1, height: 48, borderRadius: 10, background: content.accent_color || '#FFD700', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: '#000' }}>Accent</div>
                   </div>
                 </div>
@@ -229,13 +229,13 @@ function EditorInner() {
                 <Field label="Badge Text (top label)">
                   <input style={inp()} value={content.hero_badge || ''} onChange={e => set('hero_badge', e.target.value)} placeholder="e.g. Premium Sports Nutrition" />
                 </Field>
-                <div style={{ background: '#1A1A1A', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, padding: '20px', marginBottom: 20 }}>
+                <div style={{ background: '#0F1929', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, padding: '20px', marginBottom: 20 }}>
                   <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 14 }}>Headline (3 lines)</div>
                   <Field label="Line 1 (white)">
                     <input style={inp()} value={content.hero_title_1 || ''} onChange={e => set('hero_title_1', e.target.value)} placeholder="e.g. FUEL YOUR" />
                   </Field>
                   <Field label={`Line 2 (${content.primary_color || 'primary colour'})`}>
-                    <input style={inp({ borderColor: content.primary_color || '#00A550' })} value={content.hero_title_2 || ''} onChange={e => set('hero_title_2', e.target.value)} placeholder="e.g. INNER" />
+                    <input style={inp({ borderColor: content.primary_color || '#0EA5E9' })} value={content.hero_title_2 || ''} onChange={e => set('hero_title_2', e.target.value)} placeholder="e.g. INNER" />
                   </Field>
                   <Field label={`Line 3 (${content.accent_color || 'accent colour'})`}>
                     <input style={inp({ borderColor: content.accent_color || '#FFD700' })} value={content.hero_title_3 || ''} onChange={e => set('hero_title_3', e.target.value)} placeholder="e.g. CHAMPION" />
@@ -255,13 +255,13 @@ function EditorInner() {
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
                   <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)' }}>{products.length} products in catalogue</div>
-                  <button onClick={() => { setEditingProduct({ name: '', category: '', description: '', price: 0, badge: '', badge_type: 'badge-new', stat1_val: '', stat1_key: '', stat2_val: '', stat2_key: '', stat3_val: '', stat3_key: '', color_theme: 'bg-green' }); setProductModal(true) }} style={{ background: 'linear-gradient(135deg,#00A550,#007A3A)', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                  <button onClick={() => { setEditingProduct({ name: '', category: '', description: '', price: 0, badge: '', badge_type: 'badge-new', stat1_val: '', stat1_key: '', stat2_val: '', stat2_key: '', stat3_val: '', stat3_key: '', color_theme: 'bg-green' }); setProductModal(true) }} style={{ background: 'linear-gradient(135deg,#0EA5E9,#0284C7)', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
                     + Add Product
                   </button>
                 </div>
 
                 {products.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '48px', background: '#1A1A1A', borderRadius: 16, border: '1px dashed rgba(255,255,255,0.1)' }}>
+                  <div style={{ textAlign: 'center', padding: '48px', background: '#0F1929', borderRadius: 16, border: '1px dashed rgba(255,255,255,0.1)' }}>
                     <div style={{ fontSize: 36, marginBottom: 12 }}>📦</div>
                     <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 6 }}>No products yet</div>
                     <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>Click "Add Product" to build your catalogue</div>
@@ -269,13 +269,13 @@ function EditorInner() {
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                     {products.map(p => (
-                      <div key={p.id} style={{ background: '#1A1A1A', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 14, padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div key={p.id} style={{ background: '#0F1929', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 14, padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div>
                           <div style={{ fontSize: 15, fontWeight: 700 }}>{p.name}</div>
                           <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', marginTop: 3 }}>{p.category} · ${p.price}</div>
                         </div>
                         <div style={{ display: 'flex', gap: 8 }}>
-                          <button onClick={() => { setEditingProduct(p); setProductModal(true) }} style={{ background: 'rgba(0,165,80,0.1)', border: '1px solid rgba(0,165,80,0.2)', borderRadius: 8, padding: '7px 14px', color: '#00A550', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Edit</button>
+                          <button onClick={() => { setEditingProduct(p); setProductModal(true) }} style={{ background: 'rgba(14,165,233,0.1)', border: '1px solid rgba(14,165,233,0.2)', borderRadius: 8, padding: '7px 14px', color: '#0EA5E9', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Edit</button>
                           <button onClick={() => deleteProduct(p.id)} style={{ background: 'rgba(255,59,59,0.08)', border: '1px solid rgba(255,59,59,0.2)', borderRadius: 8, padding: '7px 14px', color: '#ff6b6b', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Delete</button>
                         </div>
                       </div>
@@ -294,7 +294,7 @@ function EditorInner() {
                 <Field label="Brand Story">
                   <textarea style={inp({ minHeight: 160, resize: 'vertical' })} value={content.about_text || ''} onChange={e => set('about_text', e.target.value)} placeholder="Tell your brand story…" />
                 </Field>
-                <div style={{ background: '#1A1A1A', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, padding: '20px', marginBottom: 20 }}>
+                <div style={{ background: '#0F1929', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, padding: '20px', marginBottom: 20 }}>
                   <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 14 }}>Stats Grid</div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                     {[
@@ -342,7 +342,7 @@ function EditorInner() {
       {/* Product Modal */}
       {productModal && editingProduct && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 20 }} onClick={e => e.target === e.currentTarget && setProductModal(false)}>
-          <div style={{ background: '#111', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 20, padding: '36px', width: '100%', maxWidth: 540, maxHeight: '90vh', overflowY: 'auto' }}>
+          <div style={{ background: '#0D1525', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 20, padding: '36px', width: '100%', maxWidth: 540, maxHeight: '90vh', overflowY: 'auto' }}>
             <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 28 }}>{editingProduct.id ? 'Edit Product' : 'Add Product'}</div>
             <Field label="Product Name">
               <input style={inp()} value={editingProduct.name || ''} onChange={e => setEditingProduct(p => ({ ...p!, name: e.target.value }))} placeholder="e.g. Whey Gold Isolate" />
@@ -374,7 +374,7 @@ function EditorInner() {
             ))}
             <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
               <button onClick={() => { setProductModal(false); setEditingProduct(null) }} style={{ flex: 1, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: '13px', color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
-              <button onClick={saveProduct} style={{ flex: 2, background: 'linear-gradient(135deg,#00A550,#007A3A)', border: 'none', borderRadius: 10, padding: '13px', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>Save Product →</button>
+              <button onClick={saveProduct} style={{ flex: 2, background: 'linear-gradient(135deg,#0EA5E9,#0284C7)', border: 'none', borderRadius: 10, padding: '13px', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>Save Product →</button>
             </div>
           </div>
         </div>
@@ -382,7 +382,7 @@ function EditorInner() {
 
       {/* Toast */}
       {toast && (
-        <div style={{ position: 'fixed', bottom: 28, right: 28, background: '#1A1A1A', border: '1px solid rgba(0,165,80,0.4)', borderRadius: 12, padding: '14px 22px', fontSize: 14, fontWeight: 600, zIndex: 2000, boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}>
+        <div style={{ position: 'fixed', bottom: 28, right: 28, background: '#0F1929', border: '1px solid rgba(14,165,233,0.4)', borderRadius: 12, padding: '14px 22px', fontSize: 14, fontWeight: 600, zIndex: 2000, boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}>
           {toast}
         </div>
       )}
@@ -392,7 +392,7 @@ function EditorInner() {
 
 export default function EditorPage() {
   return (
-    <Suspense fallback={<div style={{ height: '100vh', background: '#0A0A0A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><div style={{ width: 32, height: 32, border: '3px solid #00A550', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} /><style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style></div>}>
+    <Suspense fallback={<div style={{ height: '100vh', background: '#070B14', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><div style={{ width: 32, height: 32, border: '3px solid #0EA5E9', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} /><style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style></div>}>
       <EditorInner />
     </Suspense>
   )

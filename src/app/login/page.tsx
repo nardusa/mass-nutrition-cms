@@ -35,32 +35,34 @@ function LoginForm() {
     router.push(isAdmin ? '/admin' : '/editor')
   }
 
+  // Client white-label brand OR agency default (blue)
   const brand = clientData ? {
     name: clientData.business_name,
     letter: clientData.logo_letter || clientData.business_name[0]?.toUpperCase() || 'B',
-    primary: clientData.portal_color || '#00A550',
+    primary: clientData.portal_color || '#0EA5E9',
     accent: clientData.portal_accent || '#FFD700',
     tagline: 'Content Portal',
     welcomeMsg: `Sign in to manage your ${clientData.business_name} website`,
   } : {
     name: 'MJ Agency',
     letter: 'MJ',
-    primary: '#00A550',
-    accent: '#FFD700',
+    primary: '#0EA5E9',
+    accent: '#38BDF8',
     tagline: 'Admin Portal',
     welcomeMsg: 'Sign in to manage your client websites',
   }
 
   if (brandLoading) {
     return (
-      <div style={{ minHeight: '100vh', background: '#0A0A0A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: 14 }}>Loading…</div>
+      <div style={{ minHeight: '100vh', background: '#070B14', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ width: 28, height: 28, border: '3px solid #0EA5E9', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+        <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
       </div>
     )
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0A0A0A', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, position: 'relative', overflow: 'hidden' }}>
+    <div style={{ minHeight: '100vh', background: '#070B14', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, position: 'relative', overflow: 'hidden' }}>
       {/* Background glow */}
       <div style={{
         position: 'fixed', top: -300, left: '50%', transform: 'translateX(-50%)',
@@ -68,13 +70,19 @@ function LoginForm() {
         background: `radial-gradient(circle, ${brand.primary}1A 0%, transparent 70%)`,
         pointerEvents: 'none',
       }} />
+      {/* Grid lines */}
+      <div style={{
+        position: 'fixed', inset: 0, pointerEvents: 'none',
+        backgroundImage: `linear-gradient(rgba(14,165,233,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(14,165,233,0.03) 1px, transparent 1px)`,
+        backgroundSize: '60px 60px',
+      }} />
 
       <div style={{
         position: 'relative', zIndex: 1, width: '100%', maxWidth: 420,
-        background: '#111',
-        border: `1px solid ${clientData ? brand.primary + '30' : 'rgba(255,255,255,0.08)'}`,
+        background: '#0D1525',
+        border: `1px solid ${clientData ? brand.primary + '35' : 'rgba(14,165,233,0.18)'}`,
         borderRadius: 20, padding: '48px 40px',
-        boxShadow: clientData ? `0 0 60px ${brand.primary}15` : 'none',
+        boxShadow: `0 0 60px ${brand.primary}12, 0 24px 64px rgba(0,0,0,0.5)`,
       }}>
         {/* Brand header */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 40 }}>
@@ -82,7 +90,7 @@ function LoginForm() {
             width: 50, height: 50, flexShrink: 0,
             background: `linear-gradient(135deg, ${brand.primary}, ${brand.primary}BB)`,
             borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 22, fontWeight: 900, color: '#fff',
+            fontSize: clientData ? 22 : 15, fontWeight: 900, color: '#fff',
             boxShadow: `0 0 28px ${brand.primary}45`,
           }}>
             {brand.letter}
@@ -107,21 +115,17 @@ function LoginForm() {
         )}
 
         <form onSubmit={handleLogin}>
-          <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 8 }}>
-            Email
-          </label>
+          <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 8 }}>Email</label>
           <input
             type="email" placeholder="you@example.com"
             value={email} onChange={e => setEmail(e.target.value)} required
-            style={{ width: '100%', boxSizing: 'border-box', background: '#1A1A1A', border: '1.5px solid rgba(255,255,255,0.1)', borderRadius: 12, padding: '14px 16px', color: '#fff', fontSize: 15, marginBottom: 20, outline: 'none' }}
+            style={{ width: '100%', boxSizing: 'border-box', background: '#0F1929', border: '1.5px solid rgba(14,165,233,0.15)', borderRadius: 12, padding: '14px 16px', color: '#fff', fontSize: 15, marginBottom: 20, outline: 'none' }}
           />
-          <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 8 }}>
-            Password
-          </label>
+          <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 8 }}>Password</label>
           <input
             type="password" placeholder="••••••••"
             value={password} onChange={e => setPassword(e.target.value)} required
-            style={{ width: '100%', boxSizing: 'border-box', background: '#1A1A1A', border: '1.5px solid rgba(255,255,255,0.1)', borderRadius: 12, padding: '14px 16px', color: '#fff', fontSize: 15, marginBottom: 24, outline: 'none' }}
+            style={{ width: '100%', boxSizing: 'border-box', background: '#0F1929', border: '1.5px solid rgba(14,165,233,0.15)', borderRadius: 12, padding: '14px 16px', color: '#fff', fontSize: 15, marginBottom: 24, outline: 'none' }}
           />
           <button
             type="submit" disabled={loading}
@@ -129,7 +133,7 @@ function LoginForm() {
               width: '100%', border: 'none', borderRadius: 12, padding: '16px',
               background: `linear-gradient(135deg, ${brand.primary}, ${brand.primary}BB)`,
               color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer',
-              boxShadow: `0 8px 24px ${brand.primary}45`, letterSpacing: 0.5,
+              boxShadow: `0 8px 24px ${brand.primary}40`, letterSpacing: 0.5,
             }}
           >
             {loading ? 'Signing in…' : 'Sign In →'}
@@ -137,9 +141,9 @@ function LoginForm() {
         </form>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '28px 0' }}>
-          <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.07)' }} />
+          <div style={{ flex: 1, height: 1, background: 'rgba(14,165,233,0.1)' }} />
           <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)', fontWeight: 700, letterSpacing: 1.5 }}>SECURE LOGIN</div>
-          <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.07)' }} />
+          <div style={{ flex: 1, height: 1, background: 'rgba(14,165,233,0.1)' }} />
         </div>
 
         <div style={{ textAlign: 'center', fontSize: 12, color: 'rgba(255,255,255,0.2)' }}>
@@ -155,8 +159,9 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <div style={{ minHeight: '100vh', background: '#0A0A0A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: 14 }}>Loading…</div>
+      <div style={{ minHeight: '100vh', background: '#070B14', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ width: 28, height: 28, border: '3px solid #0EA5E9', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+        <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
       </div>
     }>
       <LoginForm />
