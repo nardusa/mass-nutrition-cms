@@ -1,9 +1,15 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-anon-key'
+function createSupabaseClient(): SupabaseClient {
+  // During SSR/build the client isn't needed — all DB calls happen in useEffect (browser only)
+  if (typeof window === 'undefined') return {} as SupabaseClient
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+}
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+export const supabase = createSupabaseClient()
 
 export type Client = {
   id: string
