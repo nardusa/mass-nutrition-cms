@@ -1,12 +1,11 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
 
 function createSupabaseClient(): SupabaseClient {
-  // During SSR/build the client isn't needed — all DB calls happen in useEffect (browser only)
   if (typeof window === 'undefined') return {} as SupabaseClient
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  if (!url || !url.startsWith('http') || !key) return {} as SupabaseClient
+  return createClient(url, key)
 }
 
 export const supabase = createSupabaseClient()
