@@ -131,8 +131,8 @@ function EditorInner() {
       <div style={{ width: 220, background: '#111', borderRight: '1px solid rgba(255,255,255,0.07)', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
         <div style={{ padding: '20px 16px', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-            <div style={{ width: 32, height: 32, background: 'linear-gradient(135deg,#00A550,#007A3A)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 16 }}>M</div>
-            <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.5 }}>MASS CMS</div>
+            <div style={{ width: 32, height: 32, background: 'linear-gradient(135deg,#00A550,#007A3A)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 12 }}>MJ</div>
+            <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.5 }}>MJ AGENCY</div>
           </div>
           {client && (
             <div style={{ background: 'rgba(0,165,80,0.1)', border: '1px solid rgba(0,165,80,0.2)', borderRadius: 8, padding: '10px 12px' }}>

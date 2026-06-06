@@ -179,9 +179,9 @@ export default function AdminPage() {
       <div style={{ width: 240, background: '#111', borderRight: '1px solid rgba(255,255,255,0.07)', display: 'flex', flexDirection: 'column', padding: '24px 0', flexShrink: 0 }}>
         <div style={{ padding: '0 20px 32px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 36, height: 36, background: 'linear-gradient(135deg,#00A550,#007A3A)', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 18, boxShadow: '0 0 16px rgba(0,165,80,0.3)' }}>A</div>
+            <div style={{ width: 36, height: 36, background: 'linear-gradient(135deg,#00A550,#007A3A)', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 15, boxShadow: '0 0 16px rgba(0,165,80,0.3)' }}>MJ</div>
             <div>
-              <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: 0.5 }}>AGENCY CMS</div>
+              <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: 0.5 }}>MJ AGENCY</div>
               <div style={{ fontSize: 10, color: '#00A550', fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase' }}>Admin Panel</div>
             </div>
           </div>

@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Mass Nutrition CMS',
-  description: 'Agency CMS — manage client websites',
+  title: 'MJ Agency',
+  description: 'MJ Agency — manage client websites',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

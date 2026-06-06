@@ -43,11 +43,11 @@ function LoginForm() {
     tagline: 'Content Portal',
     welcomeMsg: `Sign in to manage your ${clientData.business_name} website`,
   } : {
-    name: 'Agency CMS',
-    letter: 'A',
+    name: 'MJ Agency',
+    letter: 'MJ',
     primary: '#00A550',
     accent: '#FFD700',
-    tagline: 'Agency Admin Panel',
+    tagline: 'Admin Portal',
     welcomeMsg: 'Sign in to manage your client websites',
   }
 
