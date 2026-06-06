@@ -19,6 +19,10 @@ export type Client = {
   plan: 'starter' | 'pro' | 'agency'
   status: 'active' | 'inactive'
   created_at: string
+  slug: string | null
+  logo_letter: string | null
+  portal_color: string | null
+  portal_accent: string | null
 }
 
 export type SiteContent = {
