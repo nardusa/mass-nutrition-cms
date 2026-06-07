@@ -118,6 +118,12 @@ function EditorInner() {
     showToast('Product deleted')
   }
 
+  // Brand vars — admin sees MJ Agency blue, clients see their own color
+  const brandColor  = isAdmin ? '#0EA5E9' : (client?.portal_color  || '#0EA5E9')
+  const brandColor2 = isAdmin ? '#0284C7' : (client?.portal_accent || brandColor)
+  const brandLetter = isAdmin ? 'MJ'       : (client?.logo_letter  || client?.business_name?.[0]?.toUpperCase() || 'C')
+  const brandName   = isAdmin ? 'MJ AGENCY': (client?.business_name?.toUpperCase() || 'YOUR BRAND')
+
   if (loading) return (
     <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#070B14' }}>
       <div style={{ width: 32, height: 32, border: '3px solid #0EA5E9', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
@@ -131,20 +137,20 @@ function EditorInner() {
       <div style={{ width: 220, background: '#0D1525', borderRight: '1px solid rgba(255,255,255,0.07)', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
         <div style={{ padding: '20px 16px', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-            <div style={{ width: 32, height: 32, background: 'linear-gradient(135deg,#0EA5E9,#0284C7)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 12 }}>MJ</div>
-            <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.5 }}>MJ AGENCY</div>
+            <div style={{ width: 32, height: 32, background: `linear-gradient(135deg,${brandColor},${brandColor2})`, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: brandLetter.length > 1 ? 11 : 14, boxShadow: `0 0 14px ${brandColor}55` }}>{brandLetter}</div>
+            <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.5 }}>{brandName}</div>
           </div>
-          {client && (
-            <div style={{ background: 'rgba(14,165,233,0.1)', border: '1px solid rgba(14,165,233,0.2)', borderRadius: 8, padding: '10px 12px' }}>
+          {client && isAdmin && (
+            <div style={{ background: `${brandColor}18`, border: `1px solid ${brandColor}30`, borderRadius: 8, padding: '10px 12px' }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>{client.business_name}</div>
-              <div style={{ fontSize: 11, color: '#0EA5E9', fontWeight: 600, marginTop: 2, textTransform: 'capitalize' }}>{client.plan} plan</div>
+              <div style={{ fontSize: 11, color: brandColor, fontWeight: 600, marginTop: 2, textTransform: 'capitalize' }}>{client.plan} plan</div>
             </div>
           )}
         </div>
 
         <nav style={{ flex: 1, padding: '12px 8px', overflowY: 'auto' }}>
           {TABS.map(t => (
-            <button key={t} onClick={() => setTab(t)} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '11px 12px', borderRadius: 10, marginBottom: 3, background: tab === t ? 'rgba(14,165,233,0.12)' : 'transparent', color: tab === t ? '#0EA5E9' : 'rgba(255,255,255,0.55)', fontSize: 14, fontWeight: tab === t ? 700 : 400, cursor: 'pointer', border: 'none', textAlign: 'left', fontFamily: 'inherit' }}>
+            <button key={t} onClick={() => setTab(t)} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '11px 12px', borderRadius: 10, marginBottom: 3, background: tab === t ? `${brandColor}18` : 'transparent', color: tab === t ? brandColor : 'rgba(255,255,255,0.55)', fontSize: 14, fontWeight: tab === t ? 700 : 400, cursor: 'pointer', border: 'none', textAlign: 'left', fontFamily: 'inherit' }}>
               <span style={{ fontSize: 16 }}>
                 {t === 'Branding' ? '🎨' : t === 'Hero' ? '🏠' : t === 'Products' ? '📦' : t === 'About' ? '📖' : '🔗'}
               </span>
@@ -160,7 +166,7 @@ function EditorInner() {
             </button>
           )}
           {client?.site_url && (
-            <a href={client.site_url} target="_blank" rel="noreferrer" style={{ background: 'rgba(14,165,233,0.08)', border: '1px solid rgba(14,165,233,0.2)', borderRadius: 8, padding: '9px', color: '#0EA5E9', fontSize: 12, fontWeight: 600, textAlign: 'center', textDecoration: 'none' }}>
+            <a href={client.site_url} target="_blank" rel="noreferrer" style={{ background: `${brandColor}12`, border: `1px solid ${brandColor}30`, borderRadius: 8, padding: '9px', color: brandColor, fontSize: 12, fontWeight: 600, textAlign: 'center', textDecoration: 'none' }}>
               View Live Site ↗
             </a>
           )}
@@ -181,7 +187,7 @@ function EditorInner() {
               {tab === 'Social' && 'Social media and contact links'}
             </div>
           </div>
-          <button onClick={saveContent} disabled={saving} style={{ background: 'linear-gradient(135deg,#0EA5E9,#0284C7)', border: 'none', borderRadius: 10, padding: '12px 28px', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 16px rgba(14,165,233,0.3)' }}>
+          <button onClick={saveContent} disabled={saving} style={{ background: `linear-gradient(135deg,${brandColor},${brandColor2})`, border: 'none', borderRadius: 10, padding: '12px 28px', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', boxShadow: `0 4px 16px ${brandColor}40` }}>
             {saving ? 'Saving…' : '✓ Save Changes'}
           </button>
         </div>
@@ -255,7 +261,7 @@ function EditorInner() {
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
                   <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)' }}>{products.length} products in catalogue</div>
-                  <button onClick={() => { setEditingProduct({ name: '', category: '', description: '', price: 0, badge: '', badge_type: 'badge-new', stat1_val: '', stat1_key: '', stat2_val: '', stat2_key: '', stat3_val: '', stat3_key: '', color_theme: 'bg-green' }); setProductModal(true) }} style={{ background: 'linear-gradient(135deg,#0EA5E9,#0284C7)', border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                  <button onClick={() => { setEditingProduct({ name: '', category: '', description: '', price: 0, badge: '', badge_type: 'badge-new', stat1_val: '', stat1_key: '', stat2_val: '', stat2_key: '', stat3_val: '', stat3_key: '', color_theme: 'bg-green' }); setProductModal(true) }} style={{ background: `linear-gradient(135deg,${brandColor},${brandColor2})`, border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
                     + Add Product
                   </button>
                 </div>
@@ -374,7 +380,7 @@ function EditorInner() {
             ))}
             <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
               <button onClick={() => { setProductModal(false); setEditingProduct(null) }} style={{ flex: 1, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: '13px', color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
-              <button onClick={saveProduct} style={{ flex: 2, background: 'linear-gradient(135deg,#0EA5E9,#0284C7)', border: 'none', borderRadius: 10, padding: '13px', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>Save Product →</button>
+              <button onClick={saveProduct} style={{ flex: 2, background: `linear-gradient(135deg,${brandColor},${brandColor2})`, border: 'none', borderRadius: 10, padding: '13px', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>Save Product →</button>
             </div>
           </div>
         </div>
