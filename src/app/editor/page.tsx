@@ -118,9 +118,9 @@ function EditorInner() {
     showToast('Product deleted')
   }
 
-  // Brand vars — admin sees MJ Agency blue, clients see their own color
-  const brandColor  = isAdmin ? '#0EA5E9' : (client?.portal_color  || '#0EA5E9')
-  const brandColor2 = isAdmin ? '#0284C7' : (client?.portal_accent || brandColor)
+  // Brand vars — admin sees MJ Agency blue, clients see their live color (updates as they type)
+  const brandColor  = isAdmin ? '#0EA5E9' : (content.primary_color || client?.portal_color  || '#0EA5E9')
+  const brandColor2 = isAdmin ? '#0284C7' : (content.accent_color  || client?.portal_accent || brandColor)
   const brandLetter = isAdmin ? 'MJ'       : (client?.logo_letter  || client?.business_name?.[0]?.toUpperCase() || 'C')
   const brandName   = isAdmin ? 'MJ AGENCY': (client?.business_name?.toUpperCase() || 'YOUR BRAND')
 
