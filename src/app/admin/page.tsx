@@ -142,6 +142,19 @@ export default function AdminPage() {
     setSaving(false)
   }
 
+  async function setOwner(client: Client) {
+    if (!client.email) { showToast('Client has no email set'); return }
+    showToast('Setting owner role…')
+    const res = await fetch('/api/set-owner', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: client.email, clientId: client.id }),
+    })
+    const json = await res.json()
+    if (!res.ok) showToast('Error: ' + json.error)
+    else showToast(`✓ ${client.business_name} set as owner`)
+  }
+
   async function deleteClient(id: string, name: string) {
     if (!confirm(`Delete ${name}? This cannot be undone.`)) return
     await supabase.from('clients').delete().eq('id', id)
@@ -285,6 +298,7 @@ export default function AdminPage() {
                       <div style={{ display: 'flex', gap: 6 }}>
                         <button onClick={() => router.push(`/editor?clientId=${client.id}`)} style={{ background: 'rgba(14,165,233,0.12)', border: '1px solid rgba(14,165,233,0.25)', borderRadius: 8, padding: '7px 12px', color: '#0EA5E9', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Edit</button>
                         <button onClick={() => copyLoginLink(client)} title="Copy client login link" style={{ background: 'rgba(255,215,0,0.08)', border: '1px solid rgba(255,215,0,0.2)', borderRadius: 8, padding: '7px 10px', color: '#FFD700', fontSize: 13, cursor: 'pointer' }}>🔗</button>
+                        <button onClick={() => setOwner(client)} title="Set as site owner" style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)', borderRadius: 8, padding: '7px 10px', color: '#22C55E', fontSize: 13, cursor: 'pointer' }}>👑</button>
                         <button onClick={() => deleteClient(client.id, client.business_name)} style={{ background: 'rgba(255,59,59,0.08)', border: '1px solid rgba(255,59,59,0.2)', borderRadius: 8, padding: '7px 12px', color: '#ff6b6b', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Del</button>
                       </div>
                     </td>
@@ -367,6 +381,7 @@ export default function AdminPage() {
                 <div style={{ display: 'flex', gap: 8, paddingTop: 4, borderTop: '1px solid rgba(255,255,255,0.06)' }}>
                   <button onClick={() => router.push(`/editor?clientId=${client.id}`)} style={{ flex: 1, background: 'rgba(14,165,233,0.12)', border: '1px solid rgba(14,165,233,0.25)', borderRadius: 8, padding: '9px', color: '#0EA5E9', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Edit</button>
                   <button onClick={() => copyLoginLink(client)} title="Copy login link" style={{ background: 'rgba(255,215,0,0.08)', border: '1px solid rgba(255,215,0,0.2)', borderRadius: 8, padding: '9px 12px', color: '#FFD700', fontSize: 14, cursor: 'pointer' }}>🔗</button>
+                  <button onClick={() => setOwner(client)} title="Set as site owner" style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)', borderRadius: 8, padding: '9px 12px', color: '#22C55E', fontSize: 14, cursor: 'pointer' }}>👑</button>
                   <button onClick={() => deleteClient(client.id, client.business_name)} style={{ background: 'rgba(255,59,59,0.08)', border: '1px solid rgba(255,59,59,0.2)', borderRadius: 8, padding: '9px 12px', color: '#ff6b6b', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Del</button>
                 </div>
               </div>
