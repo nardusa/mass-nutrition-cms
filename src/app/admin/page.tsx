@@ -3,6 +3,8 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase, type Client } from '@/lib/supabase'
 
+type Section = 'Dashboard' | 'Clients' | 'Analytics' | 'Settings'
+
 const PLAN_COLORS: Record<string, string> = {
   starter: '#22C55E',
   pro: '#FFD700',
@@ -14,12 +16,20 @@ const STATUS_COLORS: Record<string, string> = {
   inactive: '#555',
 }
 
+const NAV: { icon: string; label: Section }[] = [
+  { icon: '🏠', label: 'Dashboard' },
+  { icon: '👥', label: 'Clients' },
+  { icon: '📊', label: 'Analytics' },
+  { icon: '⚙️', label: 'Settings' },
+]
+
 function slugify(name: string) {
   return name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
 }
 
 export default function AdminPage() {
   const router = useRouter()
+  const [section, setSection] = useState<Section>('Dashboard')
   const [clients, setClients] = useState<Client[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -159,7 +169,10 @@ export default function AdminPage() {
   const stats = {
     total: clients.length,
     active: clients.filter(c => c.status === 'active').length,
-    pro: clients.filter(c => c.plan === 'pro' || c.plan === 'agency').length,
+    inactive: clients.filter(c => c.status === 'inactive').length,
+    starter: clients.filter(c => c.plan === 'starter').length,
+    pro: clients.filter(c => c.plan === 'pro').length,
+    agency: clients.filter(c => c.plan === 'agency').length,
   }
 
   const fieldStyle = {
@@ -173,44 +186,10 @@ export default function AdminPage() {
     textTransform: 'uppercase' as const, marginBottom: 7,
   }
 
-  return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#070B14', color: '#fff' }}>
-      {/* Sidebar */}
-      <div style={{ width: 240, background: '#0D1525', borderRight: '1px solid rgba(255,255,255,0.07)', display: 'flex', flexDirection: 'column', padding: '24px 0', flexShrink: 0 }}>
-        <div style={{ padding: '0 20px 32px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 36, height: 36, background: 'linear-gradient(135deg,#0EA5E9,#0284C7)', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 15, boxShadow: '0 0 16px rgba(14,165,233,0.3)' }}>MJ</div>
-            <div>
-              <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: 0.5 }}>MJ AGENCY</div>
-              <div style={{ fontSize: 10, color: '#0EA5E9', fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase' }}>Admin Panel</div>
-            </div>
-          </div>
-        </div>
-
-        <nav style={{ flex: 1, padding: '0 12px' }}>
-          {[
-            { icon: '⬛', label: 'Dashboard', active: true },
-            { icon: '👥', label: 'Clients', active: false },
-            { icon: '📊', label: 'Analytics', active: false },
-            { icon: '⚙️', label: 'Settings', active: false },
-          ].map(item => (
-            <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 12px', borderRadius: 10, marginBottom: 4, background: item.active ? 'rgba(14,165,233,0.12)' : 'transparent', color: item.active ? '#0EA5E9' : 'rgba(255,255,255,0.5)', fontSize: 14, fontWeight: item.active ? 600 : 400, cursor: 'pointer' }}>
-              <span style={{ fontSize: 16 }}>{item.icon}</span>
-              {item.label}
-            </div>
-          ))}
-        </nav>
-
-        <div style={{ padding: '20px 16px', borderTop: '1px solid rgba(255,255,255,0.07)' }}>
-          <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', marginBottom: 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{adminEmail}</div>
-          <button onClick={signOut} style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, padding: '9px', color: 'rgba(255,255,255,0.6)', fontSize: 13, cursor: 'pointer', fontWeight: 600 }}>
-            Sign Out
-          </button>
-        </div>
-      </div>
-
-      {/* Main */}
-      <div style={{ flex: 1, padding: '32px 40px', overflowY: 'auto' }}>
+  // ── Dashboard ──
+  function renderDashboard() {
+    return (
+      <>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32 }}>
           <div>
             <h1 style={{ fontSize: 28, fontWeight: 800, marginBottom: 4, margin: 0 }}>Dashboard</h1>
@@ -221,12 +200,11 @@ export default function AdminPage() {
           </button>
         </div>
 
-        {/* Stats */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16, marginBottom: 32 }}>
           {[
             { label: 'Total Clients', value: stats.total, icon: '👥', color: '#0EA5E9' },
             { label: 'Active Sites', value: stats.active, icon: '🌐', color: '#FFD700' },
-            { label: 'Pro / Agency', value: stats.pro, icon: '⭐', color: '#8B5CF6' },
+            { label: 'Pro / Agency', value: stats.pro + stats.agency, icon: '⭐', color: '#8B5CF6' },
           ].map(stat => (
             <div key={stat.label} style={{ background: '#0D1525', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 16, padding: '24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -240,7 +218,6 @@ export default function AdminPage() {
           ))}
         </div>
 
-        {/* Client table */}
         <div style={{ background: '#0D1525', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 16, overflow: 'hidden' }}>
           <div style={{ padding: '20px 24px', borderBottom: '1px solid rgba(255,255,255,0.07)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ fontSize: 16, fontWeight: 700 }}>All Clients</div>
@@ -257,7 +234,7 @@ export default function AdminPage() {
             <div style={{ padding: 64, textAlign: 'center' }}>
               <div style={{ fontSize: 48, marginBottom: 16 }}>👥</div>
               <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>No clients yet</div>
-              <div style={{ color: 'rgba(255,255,255,0.45)', fontSize: 14 }}>Click "+ Add Client" to get started</div>
+              <div style={{ color: 'rgba(255,255,255,0.45)', fontSize: 14 }}>Click &quot;+ Add Client&quot; to get started</div>
             </div>
           ) : (
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -273,12 +250,7 @@ export default function AdminPage() {
                   <tr key={client.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
                     <td style={{ padding: '16px 20px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <div style={{
-                          width: 32, height: 32, borderRadius: 8, flexShrink: 0,
-                          background: `linear-gradient(135deg, ${client.portal_color || '#0EA5E9'}, ${client.portal_color || '#0EA5E9'}BB)`,
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          fontSize: 14, fontWeight: 900, color: '#fff',
-                        }}>
+                        <div style={{ width: 32, height: 32, borderRadius: 8, flexShrink: 0, background: `linear-gradient(135deg, ${client.portal_color || '#0EA5E9'}, ${client.portal_color || '#0EA5E9'}BB)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 900, color: '#fff' }}>
                           {client.logo_letter || client.business_name[0]?.toUpperCase() || 'B'}
                         </div>
                         <div>
@@ -311,25 +283,9 @@ export default function AdminPage() {
                     </td>
                     <td style={{ padding: '16px 20px' }}>
                       <div style={{ display: 'flex', gap: 6 }}>
-                        <button
-                          onClick={() => router.push(`/editor?clientId=${client.id}`)}
-                          style={{ background: 'rgba(14,165,233,0.12)', border: '1px solid rgba(14,165,233,0.25)', borderRadius: 8, padding: '7px 12px', color: '#0EA5E9', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => copyLoginLink(client)}
-                          title="Copy client login link"
-                          style={{ background: 'rgba(255,215,0,0.08)', border: '1px solid rgba(255,215,0,0.2)', borderRadius: 8, padding: '7px 10px', color: '#FFD700', fontSize: 13, cursor: 'pointer' }}
-                        >
-                          🔗
-                        </button>
-                        <button
-                          onClick={() => deleteClient(client.id, client.business_name)}
-                          style={{ background: 'rgba(255,59,59,0.08)', border: '1px solid rgba(255,59,59,0.2)', borderRadius: 8, padding: '7px 12px', color: '#ff6b6b', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
-                        >
-                          Del
-                        </button>
+                        <button onClick={() => router.push(`/editor?clientId=${client.id}`)} style={{ background: 'rgba(14,165,233,0.12)', border: '1px solid rgba(14,165,233,0.25)', borderRadius: 8, padding: '7px 12px', color: '#0EA5E9', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Edit</button>
+                        <button onClick={() => copyLoginLink(client)} title="Copy client login link" style={{ background: 'rgba(255,215,0,0.08)', border: '1px solid rgba(255,215,0,0.2)', borderRadius: 8, padding: '7px 10px', color: '#FFD700', fontSize: 13, cursor: 'pointer' }}>🔗</button>
+                        <button onClick={() => deleteClient(client.id, client.business_name)} style={{ background: 'rgba(255,59,59,0.08)', border: '1px solid rgba(255,59,59,0.2)', borderRadius: 8, padding: '7px 12px', color: '#ff6b6b', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Del</button>
                       </div>
                     </td>
                   </tr>
@@ -338,6 +294,295 @@ export default function AdminPage() {
             </table>
           )}
         </div>
+      </>
+    )
+  }
+
+  // ── Clients ──
+  function renderClients() {
+    return (
+      <>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32 }}>
+          <div>
+            <h1 style={{ fontSize: 28, fontWeight: 800, margin: 0 }}>Clients</h1>
+            <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)', marginTop: 4 }}>All client accounts and portals</div>
+          </div>
+          <div style={{ display: 'flex', gap: 12 }}>
+            <input
+              style={{ background: '#0D1525', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: '10px 16px', color: '#fff', fontSize: 13, width: 220, outline: 'none' }}
+              placeholder="Search clients…"
+              value={search} onChange={e => setSearch(e.target.value)}
+            />
+            <button onClick={() => setShowModal(true)} style={{ background: 'linear-gradient(135deg,#0EA5E9,#0284C7)', border: 'none', borderRadius: 12, padding: '12px 24px', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 16px rgba(14,165,233,0.35)', whiteSpace: 'nowrap' }}>
+              + Add Client
+            </button>
+          </div>
+        </div>
+
+        {loading ? (
+          <div style={{ padding: 48, textAlign: 'center', color: 'rgba(255,255,255,0.4)' }}>Loading clients…</div>
+        ) : filtered.length === 0 ? (
+          <div style={{ padding: 64, textAlign: 'center', background: '#0D1525', borderRadius: 16 }}>
+            <div style={{ fontSize: 48, marginBottom: 16 }}>👥</div>
+            <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>No clients yet</div>
+            <div style={{ color: 'rgba(255,255,255,0.45)', fontSize: 14 }}>Click &quot;+ Add Client&quot; to get started</div>
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
+            {filtered.map(client => (
+              <div key={client.id} style={{ background: '#0D1525', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 16, padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{ width: 44, height: 44, borderRadius: 12, flexShrink: 0, background: `linear-gradient(135deg, ${client.portal_color || '#0EA5E9'}, ${client.portal_color || '#0EA5E9'}BB)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 900, color: '#fff', boxShadow: `0 0 16px ${client.portal_color || '#0EA5E9'}40` }}>
+                    {client.logo_letter || client.business_name[0]?.toUpperCase() || 'B'}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontWeight: 800, fontSize: 15, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{client.business_name}</div>
+                    {client.slug && <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', marginTop: 1 }}>/{client.slug}</div>}
+                  </div>
+                  <span style={{ background: `${PLAN_COLORS[client.plan]}22`, color: PLAN_COLORS[client.plan], border: `1px solid ${PLAN_COLORS[client.plan]}44`, borderRadius: 50, padding: '3px 10px', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, flexShrink: 0 }}>
+                    {client.plan}
+                  </span>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>
+                    <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: 11 }}>CONTACT  </span>
+                    {client.client_name}
+                  </div>
+                  <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{client.email}</div>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <div style={{ width: 7, height: 7, borderRadius: '50%', background: STATUS_COLORS[client.status] }} />
+                    <span style={{ fontSize: 12, color: STATUS_COLORS[client.status], fontWeight: 600, textTransform: 'capitalize' }}>{client.status}</span>
+                  </div>
+                  {client.site_url ? (
+                    <a href={client.site_url} target="_blank" rel="noreferrer" style={{ color: '#0EA5E9', fontSize: 12, textDecoration: 'none', fontWeight: 600 }}>View Site ↗</a>
+                  ) : (
+                    <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: 12 }}>No site URL</span>
+                  )}
+                </div>
+
+                <div style={{ display: 'flex', gap: 8, paddingTop: 4, borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                  <button onClick={() => router.push(`/editor?clientId=${client.id}`)} style={{ flex: 1, background: 'rgba(14,165,233,0.12)', border: '1px solid rgba(14,165,233,0.25)', borderRadius: 8, padding: '9px', color: '#0EA5E9', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Edit</button>
+                  <button onClick={() => copyLoginLink(client)} title="Copy login link" style={{ background: 'rgba(255,215,0,0.08)', border: '1px solid rgba(255,215,0,0.2)', borderRadius: 8, padding: '9px 12px', color: '#FFD700', fontSize: 14, cursor: 'pointer' }}>🔗</button>
+                  <button onClick={() => deleteClient(client.id, client.business_name)} style={{ background: 'rgba(255,59,59,0.08)', border: '1px solid rgba(255,59,59,0.2)', borderRadius: 8, padding: '9px 12px', color: '#ff6b6b', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Del</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </>
+    )
+  }
+
+  // ── Analytics ──
+  function renderAnalytics() {
+    const planData = [
+      { label: 'Starter', count: stats.starter, color: '#22C55E' },
+      { label: 'Pro', count: stats.pro, color: '#FFD700' },
+      { label: 'Agency', count: stats.agency, color: '#8B5CF6' },
+    ]
+    const maxCount = Math.max(...planData.map(p => p.count), 1)
+
+    return (
+      <>
+        <div style={{ marginBottom: 32 }}>
+          <h1 style={{ fontSize: 28, fontWeight: 800, margin: 0 }}>Analytics</h1>
+          <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)', marginTop: 4 }}>Overview of your client base</div>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16, marginBottom: 28 }}>
+          {[
+            { label: 'Total Clients', value: stats.total, color: '#0EA5E9' },
+            { label: 'Active', value: stats.active, color: '#22C55E' },
+            { label: 'Inactive', value: stats.inactive, color: '#EF4444' },
+            { label: 'Pro + Agency', value: stats.pro + stats.agency, color: '#8B5CF6' },
+          ].map(s => (
+            <div key={s.label} style={{ background: '#0D1525', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 16, padding: '20px 24px' }}>
+              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', fontWeight: 700, letterSpacing: 0.5, marginBottom: 8, textTransform: 'uppercase' }}>{s.label}</div>
+              <div style={{ fontSize: 36, fontWeight: 900, color: s.color, lineHeight: 1 }}>{s.value}</div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 20 }}>
+          <div style={{ background: '#0D1525', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 16, padding: 28 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 24 }}>Plan Breakdown</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+              {planData.map(p => (
+                <div key={p.label}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 7 }}>
+                    <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>{p.label}</span>
+                    <span style={{ fontSize: 13, color: p.color, fontWeight: 700 }}>{p.count} client{p.count !== 1 ? 's' : ''}</span>
+                  </div>
+                  <div style={{ height: 8, background: 'rgba(255,255,255,0.06)', borderRadius: 4, overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: `${(p.count / maxCount) * 100}%`, background: p.color, borderRadius: 4 }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ background: '#0D1525', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 16, padding: 28 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 24 }}>Status Breakdown</div>
+            {stats.total === 0 ? (
+              <div style={{ textAlign: 'center', padding: '20px', color: 'rgba(255,255,255,0.3)', fontSize: 13 }}>No data yet</div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                {[
+                  { label: 'Active Clients', count: stats.active, color: '#22C55E' },
+                  { label: 'Inactive Clients', count: stats.inactive, color: '#EF4444' },
+                ].map(s => (
+                  <div key={s.label}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 7 }}>
+                      <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>{s.label}</span>
+                      <span style={{ fontSize: 13, color: s.color, fontWeight: 700 }}>{Math.round((s.count / stats.total) * 100)}%</span>
+                    </div>
+                    <div style={{ height: 8, background: 'rgba(255,255,255,0.06)', borderRadius: 4, overflow: 'hidden' }}>
+                      <div style={{ height: '100%', width: `${(s.count / stats.total) * 100}%`, background: s.color, borderRadius: 4 }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div style={{ background: '#0D1525', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 16, padding: 28 }}>
+          <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 20 }}>Recent Clients</div>
+          {clients.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '24px', color: 'rgba(255,255,255,0.3)', fontSize: 13 }}>No clients yet</div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {clients.slice(0, 5).map(client => (
+                <div key={client.id} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 16px', background: 'rgba(255,255,255,0.03)', borderRadius: 10 }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 10, flexShrink: 0, background: `linear-gradient(135deg, ${client.portal_color || '#0EA5E9'}, ${client.portal_color || '#0EA5E9'}BB)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 900, color: '#fff' }}>
+                    {client.logo_letter || client.business_name[0]?.toUpperCase() || 'B'}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 14, fontWeight: 700 }}>{client.business_name}</div>
+                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginTop: 1 }}>{client.email}</div>
+                  </div>
+                  <span style={{ background: `${PLAN_COLORS[client.plan]}22`, color: PLAN_COLORS[client.plan], border: `1px solid ${PLAN_COLORS[client.plan]}44`, borderRadius: 50, padding: '3px 10px', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                    {client.plan}
+                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                    <div style={{ width: 6, height: 6, borderRadius: '50%', background: STATUS_COLORS[client.status] }} />
+                    <span style={{ fontSize: 11, color: STATUS_COLORS[client.status], fontWeight: 600, textTransform: 'capitalize' }}>{client.status}</span>
+                  </div>
+                  <button onClick={() => router.push(`/editor?clientId=${client.id}`)} style={{ background: 'rgba(14,165,233,0.12)', border: '1px solid rgba(14,165,233,0.25)', borderRadius: 8, padding: '6px 12px', color: '#0EA5E9', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Edit</button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </>
+    )
+  }
+
+  // ── Settings ──
+  function renderSettings() {
+    return (
+      <>
+        <div style={{ marginBottom: 32 }}>
+          <h1 style={{ fontSize: 28, fontWeight: 800, margin: 0 }}>Settings</h1>
+          <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)', marginTop: 4 }}>Admin account and system info</div>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 20, maxWidth: 600 }}>
+          <div style={{ background: '#0D1525', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 16, padding: 28 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 20 }}>Admin Account</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 24 }}>
+              <div style={{ width: 48, height: 48, borderRadius: 14, background: 'linear-gradient(135deg,#0EA5E9,#0284C7)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 20, boxShadow: '0 0 16px rgba(14,165,233,0.3)' }}>
+                {adminEmail[0]?.toUpperCase() || 'A'}
+              </div>
+              <div>
+                <div style={{ fontSize: 15, fontWeight: 700 }}>{adminEmail}</div>
+                <div style={{ fontSize: 12, color: '#0EA5E9', fontWeight: 600, marginTop: 2 }}>Administrator</div>
+              </div>
+            </div>
+            <button onClick={signOut} style={{ background: 'rgba(255,59,59,0.08)', border: '1px solid rgba(255,59,59,0.2)', borderRadius: 10, padding: '11px 20px', color: '#ff6b6b', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+              Sign Out
+            </button>
+          </div>
+
+          <div style={{ background: '#0D1525', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 16, padding: 28 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 20 }}>System Info</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+              {[
+                { label: 'Platform', value: 'MJ Agency CMS' },
+                { label: 'Framework', value: 'Next.js 16' },
+                { label: 'Database', value: 'Supabase' },
+                { label: 'Total Clients', value: String(stats.total) },
+                { label: 'Active Sites', value: String(stats.active) },
+              ].map(row => (
+                <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                  <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', fontWeight: 600 }}>{row.label}</span>
+                  <span style={{ fontSize: 13, color: '#fff', fontWeight: 600 }}>{row.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ background: '#0D1525', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 16, padding: 28 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 16 }}>Quick Actions</div>
+            <div style={{ display: 'flex', gap: 12 }}>
+              <button onClick={() => setShowModal(true)} style={{ background: 'linear-gradient(135deg,#0EA5E9,#0284C7)', border: 'none', borderRadius: 10, padding: '11px 20px', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                + Add Client
+              </button>
+              <button onClick={() => setSection('Analytics')} style={{ background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.25)', borderRadius: 10, padding: '11px 20px', color: '#8B5CF6', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                View Analytics
+              </button>
+            </div>
+          </div>
+        </div>
+      </>
+    )
+  }
+
+  return (
+    <div style={{ display: 'flex', minHeight: '100vh', background: '#070B14', color: '#fff' }}>
+      {/* Sidebar */}
+      <div style={{ width: 240, background: '#0D1525', borderRight: '1px solid rgba(255,255,255,0.07)', display: 'flex', flexDirection: 'column', padding: '24px 0', flexShrink: 0 }}>
+        <div style={{ padding: '0 20px 32px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ width: 36, height: 36, background: 'linear-gradient(135deg,#0EA5E9,#0284C7)', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 15, boxShadow: '0 0 16px rgba(14,165,233,0.3)' }}>MJ</div>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: 0.5 }}>MJ AGENCY</div>
+              <div style={{ fontSize: 10, color: '#0EA5E9', fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase' }}>Admin Panel</div>
+            </div>
+          </div>
+        </div>
+
+        <nav style={{ flex: 1, padding: '0 12px' }}>
+          {NAV.map(item => (
+            <div
+              key={item.label}
+              onClick={() => setSection(item.label)}
+              style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 12px', borderRadius: 10, marginBottom: 4, background: section === item.label ? 'rgba(14,165,233,0.12)' : 'transparent', color: section === item.label ? '#0EA5E9' : 'rgba(255,255,255,0.5)', fontSize: 14, fontWeight: section === item.label ? 600 : 400, cursor: 'pointer' }}
+            >
+              <span style={{ fontSize: 16 }}>{item.icon}</span>
+              {item.label}
+            </div>
+          ))}
+        </nav>
+
+        <div style={{ padding: '20px 16px', borderTop: '1px solid rgba(255,255,255,0.07)' }}>
+          <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', marginBottom: 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{adminEmail}</div>
+          <button onClick={signOut} style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, padding: '9px', color: 'rgba(255,255,255,0.6)', fontSize: 13, cursor: 'pointer', fontWeight: 600 }}>
+            Sign Out
+          </button>
+        </div>
+      </div>
+
+      {/* Main */}
+      <div style={{ flex: 1, padding: '32px 40px', overflowY: 'auto' }}>
+        {section === 'Dashboard' && renderDashboard()}
+        {section === 'Clients' && renderClients()}
+        {section === 'Analytics' && renderAnalytics()}
+        {section === 'Settings' && renderSettings()}
       </div>
 
       {/* Add Client Modal */}
@@ -348,29 +593,19 @@ export default function AdminPage() {
         >
           <div style={{ background: '#0D1525', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 20, padding: '40px', width: '100%', maxWidth: 500, maxHeight: '90vh', overflowY: 'auto' }}>
             {successClient ? (
-              /* Success Screen */
               <div style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: 56, marginBottom: 16 }}>✓</div>
                 <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 8 }}>{successClient.name} added!</div>
                 <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)', marginBottom: 32 }}>Send this login link to your client</div>
-
                 <div style={{ background: '#0F1929', border: '1px solid rgba(14,165,233,0.3)', borderRadius: 12, padding: '18px 20px', marginBottom: 20, wordBreak: 'break-all', fontSize: 13, color: '#0EA5E9', fontFamily: 'monospace', textAlign: 'left' }}>
                   {successClient.loginUrl}
                 </div>
-
-                <button
-                  onClick={() => { navigator.clipboard.writeText(successClient.loginUrl); showToast('Login link copied!') }}
-                  style={{ width: '100%', background: 'linear-gradient(135deg,#0EA5E9,#0284C7)', border: 'none', borderRadius: 10, padding: '14px', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', marginBottom: 12 }}
-                >
+                <button onClick={() => { navigator.clipboard.writeText(successClient.loginUrl); showToast('Login link copied!') }} style={{ width: '100%', background: 'linear-gradient(135deg,#0EA5E9,#0284C7)', border: 'none', borderRadius: 10, padding: '14px', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', marginBottom: 12 }}>
                   Copy Login Link
                 </button>
-                <button
-                  onClick={() => { setSuccessClient(null); setShowModal(false) }}
-                  style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: '13px', color: '#fff', fontSize: 14, cursor: 'pointer' }}
-                >
+                <button onClick={() => { setSuccessClient(null); setShowModal(false) }} style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: '13px', color: '#fff', fontSize: 14, cursor: 'pointer' }}>
                   Done
                 </button>
-
                 <div style={{ marginTop: 24, padding: '16px', background: 'rgba(255,215,0,0.05)', border: '1px solid rgba(255,215,0,0.15)', borderRadius: 10, fontSize: 12, color: 'rgba(255,255,255,0.5)', textAlign: 'left', lineHeight: 1.6 }}>
                   <strong style={{ color: '#FFD700' }}>What to send your client:</strong><br />
                   1. Their login link above<br />
@@ -379,13 +614,10 @@ export default function AdminPage() {
                 </div>
               </div>
             ) : (
-              /* Add Client Form */
               <>
                 <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 6 }}>Add New Client</div>
                 <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', marginBottom: 28 }}>Create their account and white-label login portal</div>
-
                 <form onSubmit={addClient}>
-                  {/* Business + Contact */}
                   <div style={{ marginBottom: 16 }}>
                     <label style={labelStyle}>Business Name</label>
                     <input type="text" placeholder="e.g. Iron Body Gym" value={form.business_name} onChange={e => updateForm('business_name', e.target.value)} required style={fieldStyle} />
@@ -402,25 +634,16 @@ export default function AdminPage() {
                     <label style={labelStyle}>Live Site URL (optional)</label>
                     <input type="text" placeholder="https://ironbodygym.vercel.app" value={form.site_url} onChange={e => updateForm('site_url', e.target.value)} style={fieldStyle} />
                   </div>
-
-                  {/* Portal URL slug */}
                   <div style={{ marginBottom: 16 }}>
                     <label style={labelStyle}>Login Portal Slug</label>
                     <div style={{ position: 'relative' }}>
                       <span style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', fontSize: 13, color: 'rgba(255,255,255,0.3)', pointerEvents: 'none' }}>?client=</span>
-                      <input
-                        type="text" placeholder="iron-body-gym"
-                        value={form.slug} onChange={e => updateForm('slug', e.target.value)}
-                        required
-                        style={{ ...fieldStyle, paddingLeft: 90 }}
-                      />
+                      <input type="text" placeholder="iron-body-gym" value={form.slug} onChange={e => updateForm('slug', e.target.value)} required style={{ ...fieldStyle, paddingLeft: 90 }} />
                     </div>
                     <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', marginTop: 5 }}>
                       Client login URL: <span style={{ color: '#0EA5E9' }}>/login?client={form.slug || 'slug'}</span>
                     </div>
                   </div>
-
-                  {/* Branding row */}
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 60px 60px', gap: 10, marginBottom: 16 }}>
                     <div>
                       <label style={labelStyle}>Logo Letter</label>
@@ -435,8 +658,6 @@ export default function AdminPage() {
                       <input type="color" value={form.portal_accent} onChange={e => updateForm('portal_accent', e.target.value)} style={{ ...fieldStyle, padding: '6px', height: 44, cursor: 'pointer' }} />
                     </div>
                   </div>
-
-                  {/* Preview */}
                   {(form.business_name || form.logo_letter) && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: '#070B14', borderRadius: 10, padding: '12px 16px', marginBottom: 20, border: `1px solid ${form.portal_color}30` }}>
                       <div style={{ width: 36, height: 36, borderRadius: 10, background: `linear-gradient(135deg, ${form.portal_color}, ${form.portal_color}BB)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 16, color: '#fff', flexShrink: 0, boxShadow: `0 0 16px ${form.portal_color}40` }}>
@@ -449,7 +670,6 @@ export default function AdminPage() {
                       <div style={{ marginLeft: 'auto', fontSize: 10, color: 'rgba(255,255,255,0.25)' }}>Login preview</div>
                     </div>
                   )}
-
                   <div style={{ marginBottom: 28 }}>
                     <label style={labelStyle}>Plan</label>
                     <select value={form.plan} onChange={e => updateForm('plan', e.target.value)} style={{ ...fieldStyle }}>
@@ -458,11 +678,8 @@ export default function AdminPage() {
                       <option value="agency">Agency</option>
                     </select>
                   </div>
-
                   <div style={{ display: 'flex', gap: 12 }}>
-                    <button type="button" onClick={() => setShowModal(false)} style={{ flex: 1, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: '13px', color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
-                      Cancel
-                    </button>
+                    <button type="button" onClick={() => setShowModal(false)} style={{ flex: 1, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: '13px', color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
                     <button type="submit" disabled={saving} style={{ flex: 2, background: 'linear-gradient(135deg,#0EA5E9,#0284C7)', border: 'none', borderRadius: 10, padding: '13px', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 16px rgba(14,165,233,0.3)' }}>
                       {saving ? 'Creating…' : 'Create Client →'}
                     </button>
