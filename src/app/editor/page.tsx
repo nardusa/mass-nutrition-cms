@@ -73,13 +73,12 @@ function EditorInner() {
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session) { router.replace('/login'); return }
-      const admin = session.user.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL
+      const { data: profile } = await supabase.from('profiles').select('role, client_id').eq('id', session.user.id).single()
+      const admin = profile?.role === 'admin'
       setIsAdmin(admin)
       let cid = clientId
       if (!cid && !admin) {
-        // Find client record by logged-in email
-        const { data } = await supabase.from('clients').select('id').eq('email', session.user.email).single()
-        cid = data?.id || null
+        cid = profile?.client_id || null
       }
       if (!cid) { router.replace(admin ? '/admin' : '/login'); return }
       loadData(cid)

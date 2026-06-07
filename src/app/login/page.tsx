@@ -31,8 +31,8 @@ function LoginForm() {
     setError('')
     const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password })
     if (authError) { setError(authError.message); setLoading(false); return }
-    const isAdmin = data.user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL
-    router.push(isAdmin ? '/admin' : '/editor')
+    const { data: profile } = await supabase.from('profiles').select('role').eq('id', data.user!.id).single()
+    router.push(profile?.role === 'admin' ? '/admin' : '/editor')
   }
 
   // Client white-label brand OR agency default (blue)
