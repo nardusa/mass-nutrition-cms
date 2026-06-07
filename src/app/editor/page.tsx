@@ -184,6 +184,12 @@ function EditorInner() {
               View Live Site ↗
             </a>
           )}
+          <button
+            onClick={async () => { await supabase.auth.signOut(); router.push('/login') }}
+            style={{ background: 'rgba(255,59,59,0.08)', border: '1px solid rgba(255,59,59,0.2)', borderRadius: 8, padding: '9px', color: '#ff6b6b', fontSize: 12, cursor: 'pointer', fontWeight: 600 }}
+          >
+            Sign Out
+          </button>
         </div>
       </div>
 
