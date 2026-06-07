@@ -51,6 +51,7 @@ function EditorInner() {
   const [productModal, setProductModal] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Partial<Product> | null>(null)
   const [isAdmin, setIsAdmin] = useState(false)
+  const [uploadingImage, setUploadingImage] = useState(false)
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(''), 3000) }
 
@@ -109,6 +110,19 @@ function EditorInner() {
     setProductModal(false)
     setEditingProduct(null)
     showToast('✓ Product saved!')
+  }
+
+  async function uploadProductImage(file: File): Promise<string | null> {
+    const cid = content.client_id || clientId
+    if (!cid) return null
+    setUploadingImage(true)
+    const ext = file.name.split('.').pop() || 'jpg'
+    const path = `${cid}/${Date.now()}.${ext}`
+    const { error } = await supabase.storage.from('product-images').upload(path, file, { upsert: true })
+    setUploadingImage(false)
+    if (error) { showToast('Upload failed: ' + error.message); return null }
+    const { data } = supabase.storage.from('product-images').getPublicUrl(path)
+    return data.publicUrl
   }
 
   async function deleteProduct(id: string) {
@@ -261,7 +275,7 @@ function EditorInner() {
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
                   <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)' }}>{products.length} products in catalogue</div>
-                  <button onClick={() => { setEditingProduct({ name: '', category: '', description: '', price: 0, badge: '', badge_type: 'badge-new', stat1_val: '', stat1_key: '', stat2_val: '', stat2_key: '', stat3_val: '', stat3_key: '', color_theme: 'bg-green' }); setProductModal(true) }} style={{ background: `linear-gradient(135deg,${brandColor},${brandColor2})`, border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                  <button onClick={() => { setEditingProduct({ name: '', category: '', description: '', price: 0, badge: '', badge_type: 'badge-new', stat1_val: '', stat1_key: '', stat2_val: '', stat2_key: '', stat3_val: '', stat3_key: '', color_theme: 'bg-green', image_url: '' }); setProductModal(true) }} style={{ background: `linear-gradient(135deg,${brandColor},${brandColor2})`, border: 'none', borderRadius: 10, padding: '10px 20px', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
                     + Add Product
                   </button>
                 </div>
@@ -350,6 +364,50 @@ function EditorInner() {
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 20 }} onClick={e => e.target === e.currentTarget && setProductModal(false)}>
           <div style={{ background: '#0D1525', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 20, padding: '36px', width: '100%', maxWidth: 540, maxHeight: '90vh', overflowY: 'auto' }}>
             <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 28 }}>{editingProduct.id ? 'Edit Product' : 'Add Product'}</div>
+
+            {/* Image upload */}
+            <Field label="Product Image">
+              <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
+                <div style={{
+                  width: 88, height: 88, borderRadius: 14, flexShrink: 0,
+                  background: '#0F1929', border: `1.5px dashed ${brandColor}40`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  overflow: 'hidden',
+                }}>
+                  {editingProduct.image_url
+                    ? <img src={editingProduct.image_url} alt="product" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    : <span style={{ fontSize: 28 }}>📦</span>
+                  }
+                </div>
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <label style={{
+                    display: 'inline-block', cursor: 'pointer',
+                    background: `${brandColor}18`, border: `1px solid ${brandColor}40`,
+                    borderRadius: 10, padding: '9px 16px', fontSize: 13, fontWeight: 700, color: brandColor,
+                    textAlign: 'center',
+                  }}>
+                    {uploadingImage ? 'Uploading…' : '⬆ Upload Image'}
+                    <input
+                      type="file" accept="image/*" style={{ display: 'none' }}
+                      disabled={uploadingImage}
+                      onChange={async e => {
+                        const file = e.target.files?.[0]
+                        if (!file) return
+                        const url = await uploadProductImage(file)
+                        if (url) setEditingProduct(p => ({ ...p!, image_url: url }))
+                      }}
+                    />
+                  </label>
+                  <input
+                    style={inp({ fontSize: 12 })}
+                    placeholder="Or paste image URL…"
+                    value={editingProduct.image_url || ''}
+                    onChange={e => setEditingProduct(p => ({ ...p!, image_url: e.target.value }))}
+                  />
+                </div>
+              </div>
+            </Field>
+
             <Field label="Product Name">
               <input style={inp()} value={editingProduct.name || ''} onChange={e => setEditingProduct(p => ({ ...p!, name: e.target.value }))} placeholder="e.g. Whey Gold Isolate" />
             </Field>

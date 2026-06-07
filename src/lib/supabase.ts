@@ -70,4 +70,5 @@ export type Product = {
   stat3_key: string
   color_theme: string
   display_order: number
+  image_url: string
 }
