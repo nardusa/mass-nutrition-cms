@@ -55,7 +55,7 @@ export default function AdminPage() {
   const [toast, setToast] = useState('')
   const [search, setSearch] = useState('')
   const [adminEmail, setAdminEmail] = useState('')
-  const [successClient, setSuccessClient] = useState<{ name: string; loginUrl: string } | null>(null)
+  const [successClient, setSuccessClient] = useState<{ name: string; loginUrl: string; intakeUrl: string } | null>(null)
   const [intakes, setIntakes] = useState<IntakeSubmission[]>([])
   const [importingId, setImportingId] = useState<string | null>(null)
 
@@ -164,8 +164,10 @@ export default function AdminPage() {
       })
     }
 
-    const loginUrl = `${window.location.origin}/login?client=${form.slug || slugify(form.business_name)}`
-    setSuccessClient({ name: form.business_name, loginUrl })
+    const clientSlug = form.slug || slugify(form.business_name)
+    const loginUrl = `${window.location.origin}/login?client=${clientSlug}`
+    const intakeUrl = `${window.location.origin}/intake?client=${clientSlug}`
+    setSuccessClient({ name: form.business_name, loginUrl, intakeUrl })
     setForm({ business_name: '', client_name: '', email: '', plan: 'starter', site_url: '', slug: '', logo_letter: '', portal_color: '#0EA5E9', portal_accent: '#FFD700' })
     loadClients()
     setSaving(false)
@@ -768,23 +770,32 @@ export default function AdminPage() {
             {successClient ? (
               <div style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: 56, marginBottom: 16 }}>✓</div>
-                <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 8 }}>{successClient.name} added!</div>
-                <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)', marginBottom: 32 }}>Send this login link to your client</div>
-                <div style={{ background: '#0F1929', border: '1px solid rgba(14,165,233,0.3)', borderRadius: 12, padding: '18px 20px', marginBottom: 20, wordBreak: 'break-all', fontSize: 13, color: '#0EA5E9', fontFamily: 'monospace', textAlign: 'left' }}>
-                  {successClient.loginUrl}
+                <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>{successClient.name} added!</div>
+                <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)', marginBottom: 28 }}>Send these two links to your client in order</div>
+
+                <div style={{ textAlign: 'left', marginBottom: 12 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#22C55E', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 8 }}>Step 1 — Send first (intake form)</div>
+                  <div style={{ background: '#0F1929', border: '1px solid rgba(34,197,94,0.3)', borderRadius: 12, padding: '14px 16px', marginBottom: 8, wordBreak: 'break-all', fontSize: 13, color: '#22C55E', fontFamily: 'monospace' }}>
+                    {successClient.intakeUrl}
+                  </div>
+                  <button onClick={() => { navigator.clipboard.writeText(successClient.intakeUrl); showToast('Intake link copied!') }} style={{ width: '100%', background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.3)', borderRadius: 10, padding: '12px', color: '#22C55E', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                    Copy Intake Form Link
+                  </button>
                 </div>
-                <button onClick={() => { navigator.clipboard.writeText(successClient.loginUrl); showToast('Login link copied!') }} style={{ width: '100%', background: 'linear-gradient(135deg,#0EA5E9,#0284C7)', border: 'none', borderRadius: 10, padding: '14px', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', marginBottom: 12 }}>
-                  Copy Login Link
-                </button>
+
+                <div style={{ textAlign: 'left', marginBottom: 24 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#0EA5E9', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 8 }}>Step 2 — Send after site is built (login portal)</div>
+                  <div style={{ background: '#0F1929', border: '1px solid rgba(14,165,233,0.3)', borderRadius: 12, padding: '14px 16px', marginBottom: 8, wordBreak: 'break-all', fontSize: 13, color: '#0EA5E9', fontFamily: 'monospace' }}>
+                    {successClient.loginUrl}
+                  </div>
+                  <button onClick={() => { navigator.clipboard.writeText(successClient.loginUrl); showToast('Login link copied!') }} style={{ width: '100%', background: 'rgba(14,165,233,0.1)', border: '1px solid rgba(14,165,233,0.3)', borderRadius: 10, padding: '12px', color: '#0EA5E9', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                    Copy Login Link
+                  </button>
+                </div>
+
                 <button onClick={() => { setSuccessClient(null); setShowModal(false) }} style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: '13px', color: '#fff', fontSize: 14, cursor: 'pointer' }}>
                   Done
                 </button>
-                <div style={{ marginTop: 24, padding: '16px', background: 'rgba(255,215,0,0.05)', border: '1px solid rgba(255,215,0,0.15)', borderRadius: 10, fontSize: 12, color: 'rgba(255,255,255,0.5)', textAlign: 'left', lineHeight: 1.6 }}>
-                  <strong style={{ color: '#FFD700' }}>What to send your client:</strong><br />
-                  1. Their login link above<br />
-                  2. Their email: create a Supabase auth user for them<br />
-                  3. A temporary password they can change on first login
-                </div>
               </div>
             ) : (
               <>
