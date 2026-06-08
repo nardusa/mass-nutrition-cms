@@ -55,7 +55,7 @@ export default function AdminPage() {
   const [toast, setToast] = useState('')
   const [search, setSearch] = useState('')
   const [adminEmail, setAdminEmail] = useState('')
-  const [successClient, setSuccessClient] = useState<{ name: string; loginUrl: string; intakeUrl: string } | null>(null)
+  const [successClient, setSuccessClient] = useState<{ name: string; loginUrl: string; intakeUrl: string; email: string; password: string } | null>(null)
   const [intakes, setIntakes] = useState<IntakeSubmission[]>([])
   const [importingId, setImportingId] = useState<string | null>(null)
   const [linksClient, setLinksClient] = useState<Client | null>(null)
@@ -64,6 +64,7 @@ export default function AdminPage() {
     business_name: '',
     client_name: '',
     email: '',
+    password: '',
     plan: 'starter',
     site_url: '',
     slug: '',
@@ -71,6 +72,11 @@ export default function AdminPage() {
     portal_color: '#00A550',
     portal_accent: '#FFD700',
   })
+
+  function generatePassword() {
+    const chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789'
+    return Array.from({ length: 12 }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
+  }
 
   const showToast = (msg: string) => {
     setToast(msg)
@@ -165,11 +171,22 @@ export default function AdminPage() {
       })
     }
 
+    // Auto-create their Supabase auth account
+    if (newClient && form.password) {
+      const res = await fetch('/api/create-client-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: form.email, password: form.password, clientId: newClient.id }),
+      })
+      const result = await res.json()
+      if (!res.ok) showToast('Account created but auth setup failed: ' + result.error)
+    }
+
     const clientSlug = form.slug || slugify(form.business_name)
     const loginUrl = `${window.location.origin}/login?client=${clientSlug}`
     const intakeUrl = `${window.location.origin}/intake?client=${clientSlug}`
-    setSuccessClient({ name: form.business_name, loginUrl, intakeUrl })
-    setForm({ business_name: '', client_name: '', email: '', plan: 'starter', site_url: '', slug: '', logo_letter: '', portal_color: '#0EA5E9', portal_accent: '#FFD700' })
+    setSuccessClient({ name: form.business_name, loginUrl, intakeUrl, email: form.email, password: form.password })
+    setForm({ business_name: '', client_name: '', email: '', password: '', plan: 'starter', site_url: '', slug: '', logo_letter: '', portal_color: '#0EA5E9', portal_accent: '#FFD700' })
     loadClients()
     setSaving(false)
   }
@@ -779,6 +796,16 @@ export default function AdminPage() {
                 <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>{successClient.name} added!</div>
                 <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)', marginBottom: 28 }}>Send these two links to your client in order</div>
 
+                {successClient.email && successClient.password && (
+                  <div style={{ textAlign: 'left', marginBottom: 20, background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.25)', borderRadius: 12, padding: '16px' }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: '#8B5CF6', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 10 }}>✓ Account Created — Their Login Credentials</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>Email: <span style={{ color: '#fff', fontWeight: 600 }}>{successClient.email}</span></div>
+                      <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>Password: <span style={{ color: '#fff', fontWeight: 700, fontFamily: 'monospace', fontSize: 15 }}>{successClient.password}</span></div>
+                    </div>
+                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', marginTop: 10 }}>Share these credentials with your client along with their login link.</div>
+                  </div>
+                )}
                 <div style={{ textAlign: 'left', marginBottom: 12 }}>
                   <div style={{ fontSize: 11, fontWeight: 700, color: '#22C55E', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 8 }}>Step 1 — Send first (intake form)</div>
                   <div style={{ background: '#0F1929', border: '1px solid rgba(34,197,94,0.3)', borderRadius: 12, padding: '14px 16px', marginBottom: 8, wordBreak: 'break-all', fontSize: 13, color: '#22C55E', fontFamily: 'monospace' }}>
@@ -819,6 +846,15 @@ export default function AdminPage() {
                   <div style={{ marginBottom: 16 }}>
                     <label style={labelStyle}>Client Email</label>
                     <input type="email" placeholder="john@ironbodygym.com" value={form.email} onChange={e => updateForm('email', e.target.value)} required style={fieldStyle} />
+                  </div>
+                  <div style={{ marginBottom: 16 }}>
+                    <label style={labelStyle}>Portal Password <span style={{ color: 'rgba(255,255,255,0.3)', fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>— you'll share this with them</span></label>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <input type="text" placeholder="Set a password for their account" value={form.password} onChange={e => updateForm('password', e.target.value)} style={{ ...fieldStyle, flex: 1 }} />
+                      <button type="button" onClick={() => updateForm('password', generatePassword())} style={{ background: 'rgba(14,165,233,0.1)', border: '1px solid rgba(14,165,233,0.25)', borderRadius: 10, padding: '0 14px', color: '#0EA5E9', fontSize: 12, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                        Auto-generate
+                      </button>
+                    </div>
                   </div>
                   <div style={{ marginBottom: 16 }}>
                     <label style={labelStyle}>Live Site URL (optional)</label>
