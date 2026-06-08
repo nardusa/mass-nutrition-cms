@@ -58,6 +58,7 @@ export default function AdminPage() {
   const [successClient, setSuccessClient] = useState<{ name: string; loginUrl: string; intakeUrl: string } | null>(null)
   const [intakes, setIntakes] = useState<IntakeSubmission[]>([])
   const [importingId, setImportingId] = useState<string | null>(null)
+  const [linksClient, setLinksClient] = useState<Client | null>(null)
 
   const [form, setForm] = useState({
     business_name: '',
@@ -453,8 +454,7 @@ export default function AdminPage() {
                     <td style={{ padding: '16px 20px' }}>
                       <div style={{ display: 'flex', gap: 6 }}>
                         <button onClick={() => router.push(`/editor?clientId=${client.id}`)} style={{ background: 'rgba(14,165,233,0.12)', border: '1px solid rgba(14,165,233,0.25)', borderRadius: 8, padding: '7px 12px', color: '#0EA5E9', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Edit</button>
-                        <button onClick={() => copyIntakeLink(client)} title="Copy intake form link" style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)', borderRadius: 8, padding: '7px 10px', color: '#22C55E', fontSize: 13, cursor: 'pointer' }}>📋</button>
-                        <button onClick={() => copyLoginLink(client)} title="Copy client login link" style={{ background: 'rgba(255,215,0,0.08)', border: '1px solid rgba(255,215,0,0.2)', borderRadius: 8, padding: '7px 10px', color: '#FFD700', fontSize: 13, cursor: 'pointer' }}>🔗</button>
+                        <button onClick={() => setLinksClient(client)} style={{ background: 'rgba(255,215,0,0.08)', border: '1px solid rgba(255,215,0,0.2)', borderRadius: 8, padding: '7px 12px', color: '#FFD700', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Links</button>
                         <button onClick={() => setOwner(client)} title="Set as site owner" style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)', borderRadius: 8, padding: '7px 10px', color: '#22C55E', fontSize: 13, cursor: 'pointer' }}>👑</button>
                         <button onClick={() => deleteClient(client.id, client.business_name)} style={{ background: 'rgba(255,59,59,0.08)', border: '1px solid rgba(255,59,59,0.2)', borderRadius: 8, padding: '7px 12px', color: '#ff6b6b', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Del</button>
                       </div>
@@ -537,8 +537,7 @@ export default function AdminPage() {
 
                 <div style={{ display: 'flex', gap: 8, paddingTop: 4, borderTop: '1px solid rgba(255,255,255,0.06)' }}>
                   <button onClick={() => router.push(`/editor?clientId=${client.id}`)} style={{ flex: 1, background: 'rgba(14,165,233,0.12)', border: '1px solid rgba(14,165,233,0.25)', borderRadius: 8, padding: '9px', color: '#0EA5E9', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Edit</button>
-                  <button onClick={() => copyIntakeLink(client)} title="Copy intake form link" style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)', borderRadius: 8, padding: '9px 12px', color: '#22C55E', fontSize: 14, cursor: 'pointer' }}>📋</button>
-                  <button onClick={() => copyLoginLink(client)} title="Copy login link" style={{ background: 'rgba(255,215,0,0.08)', border: '1px solid rgba(255,215,0,0.2)', borderRadius: 8, padding: '9px 12px', color: '#FFD700', fontSize: 14, cursor: 'pointer' }}>🔗</button>
+                  <button onClick={() => setLinksClient(client)} style={{ background: 'rgba(255,215,0,0.08)', border: '1px solid rgba(255,215,0,0.2)', borderRadius: 8, padding: '9px 12px', color: '#FFD700', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Links</button>
                   <button onClick={() => setOwner(client)} title="Set as site owner" style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)', borderRadius: 8, padding: '9px 12px', color: '#22C55E', fontSize: 14, cursor: 'pointer' }}>👑</button>
                   <button onClick={() => deleteClient(client.id, client.business_name)} style={{ background: 'rgba(255,59,59,0.08)', border: '1px solid rgba(255,59,59,0.2)', borderRadius: 8, padding: '9px 12px', color: '#ff6b6b', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Del</button>
                 </div>
@@ -878,6 +877,43 @@ export default function AdminPage() {
                 </form>
               </>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Links Modal */}
+      {linksClient && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 20 }}
+          onClick={e => e.target === e.currentTarget && setLinksClient(null)}>
+          <div style={{ background: '#0D1525', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 20, padding: '36px', width: '100%', maxWidth: 480 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 28 }}>
+              <div>
+                <div style={{ fontSize: 18, fontWeight: 800 }}>{linksClient.business_name}</div>
+                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', marginTop: 2 }}>Client links</div>
+              </div>
+              <button onClick={() => setLinksClient(null)} style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, width: 32, height: 32, color: 'rgba(255,255,255,0.5)', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+            </div>
+
+            {[
+              { label: 'Intake Form', sublabel: 'Send this first — client fills out their preferences', color: '#22C55E', url: `${typeof window !== 'undefined' ? window.location.origin : ''}/intake?client=${linksClient.slug}` },
+              { label: 'Login Portal', sublabel: 'Send this after the site is built — gives them editor access', color: '#0EA5E9', url: `${typeof window !== 'undefined' ? window.location.origin : ''}/login?client=${linksClient.slug}` },
+            ].map(link => (
+              <div key={link.label} style={{ marginBottom: 20, background: '#0F1929', border: `1px solid ${link.color}25`, borderRadius: 14, padding: '20px' }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: link.color, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>{link.label}</div>
+                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', marginBottom: 12 }}>{link.sublabel}</div>
+                <div style={{ fontSize: 13, color: link.color, fontFamily: 'monospace', wordBreak: 'break-all', marginBottom: 14, padding: '10px 12px', background: 'rgba(0,0,0,0.3)', borderRadius: 8 }}>
+                  {link.url}
+                </div>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button onClick={() => { navigator.clipboard.writeText(link.url); showToast(`${link.label} copied!`) }} style={{ flex: 1, background: `${link.color}15`, border: `1px solid ${link.color}30`, borderRadius: 8, padding: '9px', color: link.color, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                    Copy Link
+                  </button>
+                  <a href={link.url} target="_blank" rel="noreferrer" style={{ flex: 1, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, padding: '9px', color: 'rgba(255,255,255,0.6)', fontSize: 12, fontWeight: 700, cursor: 'pointer', textDecoration: 'none', textAlign: 'center' }}>
+                    Open →
+                  </a>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}
