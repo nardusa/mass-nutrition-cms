@@ -75,7 +75,7 @@ function EditorInner() {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session) { router.replace('/login'); return }
       const { data: profile } = await supabase.from('profiles').select('role, client_id').eq('id', session.user.id).single()
-      const admin = profile?.role === 'admin'
+      const admin = profile?.role === 'admin' || session.user.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL
       setIsAdmin(admin)
       let cid = clientId
       if (!cid && !admin) {
