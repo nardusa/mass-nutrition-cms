@@ -39,10 +39,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: createError.message }, { status: 500 })
   }
 
-  // Link them to the client as owner
+  // Link them to the client as owner with must_change_password flag
   const { error: profileError } = await admin
     .from('profiles')
-    .upsert({ id: created.user.id, role: 'owner', client_id: clientId }, { onConflict: 'id' })
+    .upsert({ id: created.user.id, role: 'owner', client_id: clientId, must_change_password: true }, { onConflict: 'id' })
 
   if (profileError) return NextResponse.json({ error: profileError.message }, { status: 500 })
 

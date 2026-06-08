@@ -31,9 +31,13 @@ function LoginForm() {
     setError('')
     const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password })
     if (authError) { setError(authError.message); setLoading(false); return }
-    const { data: profile } = await supabase.from('profiles').select('role').eq('id', data.user!.id).single()
+    const { data: profile } = await supabase.from('profiles').select('role, must_change_password').eq('id', data.user!.id).single()
     const isAdmin = profile?.role === 'admin' || data.user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL
-    router.push(isAdmin ? '/admin' : '/editor')
+    if (!isAdmin && profile?.must_change_password) {
+      router.push('/change-password')
+    } else {
+      router.push(isAdmin ? '/admin' : '/editor')
+    }
   }
 
   // Client white-label brand OR agency default (blue)
