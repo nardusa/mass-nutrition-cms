@@ -194,10 +194,15 @@ export default function AdminPage() {
   }
 
   function copyLoginLink(client: Client) {
-    if (!client.slug) { showToast('No login link — client has no slug set'); return }
-    const url = `${window.location.origin}/login?client=${client.slug}`
-    navigator.clipboard.writeText(url)
+    if (!client.slug) { showToast('No slug set for this client'); return }
+    navigator.clipboard.writeText(`${window.location.origin}/login?client=${client.slug}`)
     showToast('Login link copied!')
+  }
+
+  function copyIntakeLink(client: Client) {
+    if (!client.slug) { showToast('No slug set for this client'); return }
+    navigator.clipboard.writeText(`${window.location.origin}/intake?client=${client.slug}`)
+    showToast('Intake link copied!')
   }
 
   async function signOut() {
@@ -448,6 +453,7 @@ export default function AdminPage() {
                     <td style={{ padding: '16px 20px' }}>
                       <div style={{ display: 'flex', gap: 6 }}>
                         <button onClick={() => router.push(`/editor?clientId=${client.id}`)} style={{ background: 'rgba(14,165,233,0.12)', border: '1px solid rgba(14,165,233,0.25)', borderRadius: 8, padding: '7px 12px', color: '#0EA5E9', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Edit</button>
+                        <button onClick={() => copyIntakeLink(client)} title="Copy intake form link" style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)', borderRadius: 8, padding: '7px 10px', color: '#22C55E', fontSize: 13, cursor: 'pointer' }}>📋</button>
                         <button onClick={() => copyLoginLink(client)} title="Copy client login link" style={{ background: 'rgba(255,215,0,0.08)', border: '1px solid rgba(255,215,0,0.2)', borderRadius: 8, padding: '7px 10px', color: '#FFD700', fontSize: 13, cursor: 'pointer' }}>🔗</button>
                         <button onClick={() => setOwner(client)} title="Set as site owner" style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)', borderRadius: 8, padding: '7px 10px', color: '#22C55E', fontSize: 13, cursor: 'pointer' }}>👑</button>
                         <button onClick={() => deleteClient(client.id, client.business_name)} style={{ background: 'rgba(255,59,59,0.08)', border: '1px solid rgba(255,59,59,0.2)', borderRadius: 8, padding: '7px 12px', color: '#ff6b6b', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Del</button>
@@ -531,6 +537,7 @@ export default function AdminPage() {
 
                 <div style={{ display: 'flex', gap: 8, paddingTop: 4, borderTop: '1px solid rgba(255,255,255,0.06)' }}>
                   <button onClick={() => router.push(`/editor?clientId=${client.id}`)} style={{ flex: 1, background: 'rgba(14,165,233,0.12)', border: '1px solid rgba(14,165,233,0.25)', borderRadius: 8, padding: '9px', color: '#0EA5E9', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Edit</button>
+                  <button onClick={() => copyIntakeLink(client)} title="Copy intake form link" style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)', borderRadius: 8, padding: '9px 12px', color: '#22C55E', fontSize: 14, cursor: 'pointer' }}>📋</button>
                   <button onClick={() => copyLoginLink(client)} title="Copy login link" style={{ background: 'rgba(255,215,0,0.08)', border: '1px solid rgba(255,215,0,0.2)', borderRadius: 8, padding: '9px 12px', color: '#FFD700', fontSize: 14, cursor: 'pointer' }}>🔗</button>
                   <button onClick={() => setOwner(client)} title="Set as site owner" style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)', borderRadius: 8, padding: '9px 12px', color: '#22C55E', fontSize: 14, cursor: 'pointer' }}>👑</button>
                   <button onClick={() => deleteClient(client.id, client.business_name)} style={{ background: 'rgba(255,59,59,0.08)', border: '1px solid rgba(255,59,59,0.2)', borderRadius: 8, padding: '9px 12px', color: '#ff6b6b', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Del</button>
