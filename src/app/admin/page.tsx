@@ -4,7 +4,23 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase, type Client } from '@/lib/supabase'
 
-type Section = 'Dashboard' | 'Clients' | 'Analytics' | 'Settings'
+type Section = 'Dashboard' | 'Clients' | 'Intakes' | 'Analytics' | 'Settings'
+
+type IntakeSubmission = {
+  id: string
+  client_id: string
+  status: string
+  vibe: string | null
+  primary_color: string | null
+  accent_color: string | null
+  pages: string[] | null
+  instagram: string | null
+  facebook: string | null
+  tiktok: string | null
+  notes: string | null
+  submitted_at: string
+  clients?: { business_name: string; slug: string | null }
+}
 
 const PLAN_COLORS: Record<string, string> = {
   starter: '#22C55E',
@@ -20,6 +36,7 @@ const STATUS_COLORS: Record<string, string> = {
 const NAV: { icon: string; label: Section }[] = [
   { icon: '🏠', label: 'Dashboard' },
   { icon: '👥', label: 'Clients' },
+  { icon: '📋', label: 'Intakes' },
   { icon: '📊', label: 'Analytics' },
   { icon: '⚙️', label: 'Settings' },
 ]
@@ -39,6 +56,8 @@ export default function AdminPage() {
   const [search, setSearch] = useState('')
   const [adminEmail, setAdminEmail] = useState('')
   const [successClient, setSuccessClient] = useState<{ name: string; loginUrl: string } | null>(null)
+  const [intakes, setIntakes] = useState<IntakeSubmission[]>([])
+  const [importingId, setImportingId] = useState<string | null>(null)
 
   const [form, setForm] = useState({
     business_name: '',
@@ -63,6 +82,14 @@ export default function AdminPage() {
     setLoading(false)
   }, [])
 
+  const loadIntakes = useCallback(async () => {
+    const { data } = await supabase
+      .from('intake_submissions')
+      .select('*, clients(business_name, slug)')
+      .order('submitted_at', { ascending: false })
+    setIntakes(data || [])
+  }, [])
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session) { router.replace('/login'); return }
@@ -70,8 +97,9 @@ export default function AdminPage() {
       setAdminEmail(email)
       if (email !== process.env.NEXT_PUBLIC_ADMIN_EMAIL) { router.replace('/editor'); return }
       loadClients()
+      loadIntakes()
     })
-  }, [router, loadClients])
+  }, [router, loadClients, loadIntakes])
 
   function updateForm(key: string, value: string) {
     setForm(f => {
@@ -198,6 +226,126 @@ export default function AdminPage() {
     display: 'block', fontSize: 11, fontWeight: 700,
     color: 'rgba(255,255,255,0.5)', letterSpacing: 1,
     textTransform: 'uppercase' as const, marginBottom: 7,
+  }
+
+  async function importToEditor(intake: IntakeSubmission) {
+    setImportingId(intake.id)
+    if (intake.primary_color || intake.accent_color || intake.instagram || intake.tiktok || intake.facebook) {
+      await supabase.from('site_content').update({
+        ...(intake.primary_color && { primary_color: intake.primary_color }),
+        ...(intake.accent_color && { accent_color: intake.accent_color }),
+        ...(intake.instagram && { instagram: intake.instagram }),
+        ...(intake.facebook && { facebook: intake.facebook }),
+        ...(intake.tiktok && { tiktok: intake.tiktok }),
+      }).eq('client_id', intake.client_id)
+    }
+    if (intake.primary_color) {
+      await supabase.from('clients').update({ portal_color: intake.primary_color, portal_accent: intake.accent_color }).eq('id', intake.client_id)
+    }
+    await supabase.from('intake_submissions').update({ status: 'imported' }).eq('id', intake.id)
+    loadIntakes()
+    setImportingId(null)
+    showToast('Imported! Opening editor…')
+    setTimeout(() => router.push(`/editor?clientId=${intake.client_id}`), 800)
+  }
+
+  async function markReviewed(id: string) {
+    await supabase.from('intake_submissions').update({ status: 'reviewed' }).eq('id', id)
+    loadIntakes()
+  }
+
+  // ── Intakes ──
+  function renderIntakes() {
+    const pending = intakes.filter(i => i.status === 'pending')
+    const reviewed = intakes.filter(i => i.status !== 'pending')
+    const VIBE_LABELS: Record<string, string> = { clean: '✨ Clean & Modern', bold: '⚡ Bold & Dark', warm: '🌿 Warm & Friendly', classic: '🏛️ Classic & Professional' }
+
+    return (
+      <>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32 }}>
+          <div>
+            <h1 style={{ fontSize: 28, fontWeight: 800, margin: 0 }}>Client Intakes</h1>
+            <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)', marginTop: 4 }}>Review submissions and import to editor</div>
+          </div>
+          {pending.length > 0 && (
+            <div style={{ background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 700, color: '#EF4444' }}>
+              {pending.length} pending review
+            </div>
+          )}
+        </div>
+
+        {intakes.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '80px 20px', background: '#0D1525', borderRadius: 16, border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ fontSize: 48, marginBottom: 16 }}>📋</div>
+            <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>No intakes yet</div>
+            <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: 14 }}>When a client fills out their intake form, it shows up here.</div>
+          </div>
+        ) : (
+          <>
+            {pending.length > 0 && (
+              <div style={{ marginBottom: 32 }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: '#EF4444', letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 16 }}>Pending Review</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  {pending.map(intake => (
+                    <div key={intake.id} style={{ background: '#0D1525', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 16, padding: '28px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
+                        <div>
+                          <div style={{ fontSize: 18, fontWeight: 800 }}>{intake.clients?.business_name || 'Unknown Client'}</div>
+                          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', marginTop: 3 }}>Submitted {new Date(intake.submitted_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
+                        </div>
+                        <div style={{ display: 'flex', gap: 10 }}>
+                          <button onClick={() => markReviewed(intake.id)} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, padding: '9px 16px', color: 'rgba(255,255,255,0.6)', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                            Mark Reviewed
+                          </button>
+                          <button onClick={() => importToEditor(intake)} disabled={importingId === intake.id} style={{ background: 'linear-gradient(135deg,#0EA5E9,#0284C7)', border: 'none', borderRadius: 8, padding: '9px 20px', color: '#fff', fontSize: 12, fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 12px rgba(14,165,233,0.3)', opacity: importingId === intake.id ? 0.6 : 1 }}>
+                            {importingId === intake.id ? 'Importing…' : 'Import to Editor →'}
+                          </button>
+                        </div>
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12 }}>
+                        {[
+                          { label: 'Vibe', value: intake.vibe ? VIBE_LABELS[intake.vibe] : '—' },
+                          { label: 'Colors', value: intake.primary_color ? <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}><div style={{ width: 18, height: 18, borderRadius: 4, background: intake.primary_color }} /><div style={{ width: 18, height: 18, borderRadius: 4, background: intake.accent_color || '#ccc' }} /><span>{intake.primary_color}</span></div> : 'You choose' },
+                          { label: 'Pages', value: intake.pages?.join(', ') || 'Home' },
+                          { label: 'Instagram', value: intake.instagram || '—' },
+                          { label: 'Facebook', value: intake.facebook || '—' },
+                          { label: 'TikTok', value: intake.tiktok || '—' },
+                          ...(intake.notes ? [{ label: 'Notes', value: intake.notes }] : []),
+                        ].map(row => (
+                          <div key={row.label} style={{ background: 'rgba(255,255,255,0.03)', borderRadius: 10, padding: '12px 14px' }}>
+                            <div style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.35)', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>{row.label}</div>
+                            <div style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>{row.value}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {reviewed.length > 0 && (
+              <div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.3)', letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 16 }}>Reviewed / Imported</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {reviewed.map(intake => (
+                    <div key={intake.id} style={{ background: '#0D1525', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 12, padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: 0.7 }}>
+                      <div>
+                        <div style={{ fontSize: 14, fontWeight: 700 }}>{intake.clients?.business_name || 'Unknown'}</div>
+                        <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', marginTop: 2 }}>{new Date(intake.submitted_at).toLocaleDateString()}</div>
+                      </div>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: intake.status === 'imported' ? '#22C55E' : 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: 1 }}>
+                        {intake.status}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </>
+    )
   }
 
   // ── Dashboard ──
@@ -573,16 +721,24 @@ export default function AdminPage() {
         </div>
 
         <nav style={{ flex: 1, padding: '0 12px' }}>
-          {NAV.map(item => (
-            <div
-              key={item.label}
-              onClick={() => setSection(item.label)}
-              style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 12px', borderRadius: 10, marginBottom: 4, background: section === item.label ? 'rgba(14,165,233,0.12)' : 'transparent', color: section === item.label ? '#0EA5E9' : 'rgba(255,255,255,0.5)', fontSize: 14, fontWeight: section === item.label ? 600 : 400, cursor: 'pointer' }}
-            >
-              <span style={{ fontSize: 16 }}>{item.icon}</span>
-              {item.label}
-            </div>
-          ))}
+          {NAV.map(item => {
+            const pendingCount = item.label === 'Intakes' ? intakes.filter(i => i.status === 'pending').length : 0
+            return (
+              <div
+                key={item.label}
+                onClick={() => setSection(item.label)}
+                style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 12px', borderRadius: 10, marginBottom: 4, background: section === item.label ? 'rgba(14,165,233,0.12)' : 'transparent', color: section === item.label ? '#0EA5E9' : 'rgba(255,255,255,0.5)', fontSize: 14, fontWeight: section === item.label ? 600 : 400, cursor: 'pointer' }}
+              >
+                <span style={{ fontSize: 16 }}>{item.icon}</span>
+                {item.label}
+                {pendingCount > 0 && (
+                  <span style={{ marginLeft: 'auto', background: '#EF4444', borderRadius: 50, width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800, color: '#fff', flexShrink: 0 }}>
+                    {pendingCount}
+                  </span>
+                )}
+              </div>
+            )
+          })}
         </nav>
 
         <div style={{ padding: '20px 16px', borderTop: '1px solid rgba(255,255,255,0.07)' }}>
@@ -597,6 +753,7 @@ export default function AdminPage() {
       <div style={{ flex: 1, padding: '32px 40px', overflowY: 'auto' }}>
         {section === 'Dashboard' && renderDashboard()}
         {section === 'Clients' && renderClients()}
+        {section === 'Intakes' && renderIntakes()}
         {section === 'Analytics' && renderAnalytics()}
         {section === 'Settings' && renderSettings()}
       </div>
