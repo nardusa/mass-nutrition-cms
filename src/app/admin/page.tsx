@@ -1,6 +1,6 @@
 'use client'
 export const dynamic = 'force-dynamic'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase, type Client } from '@/lib/supabase'
 
@@ -107,6 +107,9 @@ export default function AdminPage() {
   })
   const [editCell, setEditCell] = useState<{ id: string; field: string } | null>(null)
   const [editVal, setEditVal]   = useState('')
+  const [showImportModal, setShowImportModal] = useState(false)
+  const [importRows, setImportRows] = useState<Partial<PipelineLead>[]>([])
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const [form, setForm] = useState({
     business_name: '', client_name: '', email: '', password: '',
@@ -291,6 +294,83 @@ export default function AdminPage() {
       ...l, [editCell.field]: editCell.field === 'value' ? (Number(editVal) || 0) : editVal,
     }))
     setEditCell(null)
+  }
+
+  function parseCSV(text: string): Record<string, string>[] {
+    const rows: string[][] = []
+    let cur = '', inQ = false, row: string[] = []
+    for (let i = 0; i < text.length; i++) {
+      const ch = text[i]
+      if (ch === '"') {
+        if (inQ && text[i + 1] === '"') { cur += '"'; i++ } else inQ = !inQ
+      } else if (ch === ',' && !inQ) {
+        row.push(cur.trim()); cur = ''
+      } else if ((ch === '\n' || ch === '\r') && !inQ) {
+        if (ch === '\r' && text[i + 1] === '\n') i++
+        row.push(cur.trim()); cur = ''
+        if (row.some(c => c)) rows.push(row)
+        row = []
+      } else { cur += ch }
+    }
+    if (cur || row.length) { row.push(cur.trim()); if (row.some(c => c)) rows.push(row) }
+    if (rows.length < 2) return []
+    const headers = rows[0].map(h => h.toLowerCase().replace(/"/g, '').trim())
+    return rows.slice(1).map(vals => {
+      const obj: Record<string, string> = {}
+      headers.forEach((h, i) => { obj[h] = (vals[i] || '').replace(/"/g, '').trim() })
+      return obj
+    })
+  }
+
+  function mapToLead(row: Record<string, string>): Partial<PipelineLead> {
+    const pick = (...keys: string[]) => {
+      for (const col of Object.keys(row)) {
+        if (keys.some(k => col.includes(k))) return row[col]
+      }
+      return ''
+    }
+    return {
+      business: pick('business', 'company', 'organization', 'brand', 'studio', 'gym') || pick('name'),
+      name:     pick('contact name', 'full name', 'first name', 'person', 'contact') || pick('name'),
+      email:    pick('email'),
+      phone:    pick('phone', 'mobile', 'cell', 'tel'),
+      value:    Number(pick('value', 'mrr', 'monthly', 'price', 'amount', 'revenue', 'rate')) || 149,
+      notes:    pick('notes', 'note', 'comment', 'description', 'details'),
+      stage:    'lead',
+    }
+  }
+
+  function handleCSVFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = evt => {
+      const text = evt.target?.result as string
+      const raw = parseCSV(text)
+      const mapped = raw.map(mapToLead).filter(l => l.business || l.name || l.email)
+      setImportRows(mapped)
+      setShowImportModal(true)
+    }
+    reader.readAsText(file)
+    e.target.value = ''
+  }
+
+  function confirmImport() {
+    const newLeads: PipelineLead[] = importRows.map((row, i) => ({
+      id: `import_${Date.now()}_${i}`,
+      business:  row.business || '',
+      name:      row.name     || '',
+      email:     row.email    || '',
+      phone:     row.phone    || '',
+      stage:     'lead',
+      value:     Number(row.value) || 149,
+      notes:     row.notes    || '',
+      createdAt: new Date().toISOString(),
+    }))
+    savePipeline([...newLeads, ...leads])
+    setShowImportModal(false)
+    setImportRows([])
+    showToast(`Imported ${newLeads.length} lead${newLeads.length !== 1 ? 's' : ''}`)
   }
 
   // ── Computed ──────────────────────────────────────────────────────────────
@@ -547,9 +627,14 @@ export default function AdminPage() {
             <div style={{ fontSize: 11, fontWeight: 700, color: T.textDim, letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 6 }}>Sales</div>
             <h1 style={{ fontSize: 32, fontWeight: 900, margin: 0, letterSpacing: -1 }}>Pipeline</h1>
           </div>
-          <button onClick={() => setShowLeadModal(true)} style={{ background: T.accent, border: 'none', borderRadius: 12, padding: '13px 24px', color: '#000', fontSize: 14, fontWeight: 800, cursor: 'pointer' }}>
-            + Add Lead
-          </button>
+          <div style={{ display: 'flex', gap: 10 }}>
+            <button onClick={() => fileInputRef.current?.click()} style={{ background: 'rgba(255,255,255,0.06)', border: `1px solid ${T.borderStrong}`, borderRadius: 12, padding: '13px 20px', color: T.textMuted, fontSize: 14, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
+              ⬆ Import CSV
+            </button>
+            <button onClick={() => setShowLeadModal(true)} style={{ background: T.accent, border: 'none', borderRadius: 12, padding: '13px 24px', color: '#000', fontSize: 14, fontWeight: 800, cursor: 'pointer' }}>
+              + Add Lead
+            </button>
+          </div>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16, marginBottom: 28 }}>
@@ -1067,6 +1152,80 @@ export default function AdminPage() {
                     </button>
                   </div>
                 </form>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── Hidden CSV file input ── */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".csv,text/csv"
+        style={{ display: 'none' }}
+        onChange={handleCSVFile}
+      />
+
+      {/* ── CSV Import Preview Modal ── */}
+      {showImportModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 20 }}
+          onClick={e => e.target === e.currentTarget && setShowImportModal(false)}>
+          <div style={{ background: '#141414', border: `1px solid ${T.borderStrong}`, borderRadius: 20, padding: '40px', width: '100%', maxWidth: 780, maxHeight: '85vh', overflowY: 'auto' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
+              <div>
+                <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>Import Leads</div>
+                <div style={{ fontSize: 13, color: T.textMuted }}>{importRows.length} row{importRows.length !== 1 ? 's' : ''} detected — all will be added as <span style={{ color: T.accentText, fontWeight: 700 }}>New Lead</span></div>
+              </div>
+              <button onClick={() => setShowImportModal(false)} style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${T.border}`, borderRadius: 8, width: 32, height: 32, color: T.textMuted, fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+            </div>
+
+            {importRows.length === 0 ? (
+              <div style={{ padding: '40px', textAlign: 'center', color: T.textMuted, fontSize: 14 }}>
+                No recognizable rows found. Make sure your CSV has headers like: <span style={{ color: T.accentText }}>business, name, email, phone, value, notes</span>
+              </div>
+            ) : (
+              <>
+                <div style={{ overflowX: 'auto', marginBottom: 24 }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600, fontSize: 13 }}>
+                    <thead>
+                      <tr style={{ borderBottom: `1px solid ${T.border}` }}>
+                        {['#', 'Business', 'Contact Name', 'Email', 'Phone', '$/mo', 'Notes'].map(h => (
+                          <th key={h} style={{ padding: '10px 14px', textAlign: 'left', fontSize: 10, fontWeight: 700, color: T.textDim, letterSpacing: 1, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {importRows.slice(0, 10).map((row, i) => (
+                        <tr key={i} style={{ borderTop: `1px solid ${T.border}` }}>
+                          <td style={{ padding: '10px 14px', color: T.textDim, fontSize: 11 }}>{i + 1}</td>
+                          <td style={{ padding: '10px 14px', fontWeight: 700 }}>{row.business || <em style={{ color: T.textDim, fontStyle: 'normal' }}>—</em>}</td>
+                          <td style={{ padding: '10px 14px', color: T.textMuted }}>{row.name || <em style={{ color: T.textDim, fontStyle: 'normal' }}>—</em>}</td>
+                          <td style={{ padding: '10px 14px', color: T.textMuted }}>{row.email || <em style={{ color: T.textDim, fontStyle: 'normal' }}>—</em>}</td>
+                          <td style={{ padding: '10px 14px', color: T.textMuted }}>{String(row.phone || '') || <em style={{ color: T.textDim, fontStyle: 'normal' }}>—</em>}</td>
+                          <td style={{ padding: '10px 14px', color: T.accentText, fontWeight: 700 }}>${row.value || 149}</td>
+                          <td style={{ padding: '10px 14px', color: T.textMuted, maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{String(row.notes || '') || <em style={{ color: T.textDim, fontStyle: 'normal' }}>—</em>}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {importRows.length > 10 && (
+                    <div style={{ padding: '12px 14px', color: T.textDim, fontSize: 12 }}>
+                      + {importRows.length - 10} more row{importRows.length - 10 !== 1 ? 's' : ''} not shown
+                    </div>
+                  )}
+                </div>
+
+                <div style={{ background: T.accentDim, border: `1px solid ${T.accentBorder}`, borderRadius: 12, padding: '14px 18px', marginBottom: 24, fontSize: 12, color: T.accentText }}>
+                  All rows will be added with stage <strong>New Lead</strong>. You can update individual fields inline in the pipeline table after importing.
+                </div>
+
+                <div style={{ display: 'flex', gap: 12 }}>
+                  <button onClick={() => setShowImportModal(false)} style={{ flex: 1, background: 'rgba(255,255,255,0.04)', border: `1px solid ${T.border}`, borderRadius: 10, padding: '13px', color: T.text, fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Cancel</button>
+                  <button onClick={confirmImport} style={{ flex: 2, background: T.accent, border: 'none', borderRadius: 10, padding: '13px', color: '#000', fontSize: 14, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
+                    Import {importRows.length} Lead{importRows.length !== 1 ? 's' : ''} →
+                  </button>
+                </div>
               </>
             )}
           </div>
