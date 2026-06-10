@@ -105,6 +105,8 @@ export default function AdminPage() {
     name: '', business: '', email: '', phone: '',
     stage: 'lead' as PipelineLead['stage'], value: '149', notes: '',
   })
+  const [editCell, setEditCell] = useState<{ id: string; field: string } | null>(null)
+  const [editVal, setEditVal]   = useState('')
 
   const [form, setForm] = useState({
     business_name: '', client_name: '', email: '', password: '',
@@ -276,6 +278,19 @@ export default function AdminPage() {
   function deleteLead(id: string) {
     savePipeline(leads.filter(l => l.id !== id))
     showToast('Lead removed')
+  }
+
+  function startEdit(id: string, field: string, val: string) {
+    setEditCell({ id, field })
+    setEditVal(val)
+  }
+
+  function commitEdit() {
+    if (!editCell) return
+    savePipeline(leads.map(l => l.id !== editCell.id ? l : {
+      ...l, [editCell.field]: editCell.field === 'value' ? (Number(editVal) || 0) : editVal,
+    }))
+    setEditCell(null)
   }
 
   // ── Computed ──────────────────────────────────────────────────────────────
@@ -554,49 +569,76 @@ export default function AdminPage() {
           </div>
         ) : (
           <div style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 16, overflow: 'hidden' }}>
+            {/* hint row */}
+            <div style={{ padding: '10px 20px', borderBottom: `1px solid ${T.border}`, fontSize: 11, color: T.textDim, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ opacity: 0.5 }}>✎</span> Click any cell to edit · Enter to save · Esc to cancel
+            </div>
             <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 700 }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 760 }}>
                 <thead>
                   <tr style={{ borderBottom: `1px solid ${T.border}` }}>
-                    {['Business / Lead', 'Contact', 'Stage', 'Value', 'Notes', ''].map(h => (
-                      <th key={h} style={{ padding: '14px 20px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: T.textDim, letterSpacing: 1, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{h}</th>
+                    {['Business', 'Contact Name', 'Email', 'Phone', 'Stage', '$/mo', 'Notes', ''].map(h => (
+                      <th key={h} style={{ padding: '12px 14px', textAlign: 'left', fontSize: 10, fontWeight: 700, color: T.textDim, letterSpacing: 1, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {leads.map((lead, i) => {
                     const s = STAGES.find(x => x.key === lead.stage)!
+                    function EC({ field, val, bold, num }: { field: string; val: string | number; bold?: boolean; num?: boolean }) {
+                      const active = editCell?.id === lead.id && editCell?.field === field
+                      if (active) return (
+                        <input
+                          autoFocus
+                          type={num ? 'number' : 'text'}
+                          value={editVal}
+                          onChange={e => setEditVal(e.target.value)}
+                          onBlur={commitEdit}
+                          onKeyDown={e => { if (e.key === 'Enter') commitEdit(); if (e.key === 'Escape') setEditCell(null) }}
+                          style={{ background: T.accentDim, border: `1.5px solid ${T.accentBorder}`, borderRadius: 6, padding: '5px 8px', color: T.text, fontSize: 13, outline: 'none', width: '100%', minWidth: 70, fontFamily: 'inherit', fontWeight: bold ? 700 : 400 }}
+                        />
+                      )
+                      const display = String(val || '')
+                      return (
+                        <span
+                          onClick={() => startEdit(lead.id, field, display)}
+                          title="Click to edit"
+                          style={{ cursor: 'text', display: 'block', padding: '4px 6px', borderRadius: 6, border: '1px solid transparent', minWidth: 50, color: display ? (bold ? T.text : T.textMuted) : T.textDim, fontWeight: bold ? 700 : 400, fontSize: 13, transition: 'border-color 0.1s' }}
+                          onMouseEnter={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)')}
+                          onMouseLeave={e => (e.currentTarget.style.borderColor = 'transparent')}
+                        >
+                          {display || <em style={{ opacity: 0.3, fontStyle: 'normal' }}>—</em>}
+                        </span>
+                      )
+                    }
                     return (
                       <tr key={lead.id} style={{ borderTop: i > 0 ? `1px solid ${T.border}` : 'none' }}>
-                        <td style={{ padding: '16px 20px' }}>
-                          <div style={{ fontWeight: 700, fontSize: 14 }}>{lead.business || '—'}</div>
-                          <div style={{ fontSize: 11, color: T.textDim, marginTop: 1 }}>{lead.name}</div>
-                        </td>
-                        <td style={{ padding: '16px 20px' }}>
-                          <div style={{ fontSize: 13, color: T.textMuted }}>{lead.email || '—'}</div>
-                          {lead.phone && <div style={{ fontSize: 11, color: T.textDim, marginTop: 1 }}>{lead.phone}</div>}
-                        </td>
-                        <td style={{ padding: '16px 20px' }}>
+                        <td style={{ padding: '10px 14px' }}><EC field="business" val={lead.business} bold /></td>
+                        <td style={{ padding: '10px 14px' }}><EC field="name" val={lead.name} /></td>
+                        <td style={{ padding: '10px 14px' }}><EC field="email" val={lead.email} /></td>
+                        <td style={{ padding: '10px 14px' }}><EC field="phone" val={lead.phone} /></td>
+                        <td style={{ padding: '10px 14px' }}>
                           <select
                             value={lead.stage}
                             onChange={e => updateLeadStage(lead.id, e.target.value as PipelineLead['stage'])}
-                            style={{ background: `${s.color}18`, border: `1px solid ${s.color}40`, borderRadius: 8, padding: '6px 10px', color: s.color, fontSize: 11, fontWeight: 700, cursor: 'pointer', outline: 'none', fontFamily: 'inherit' }}
+                            style={{ background: `${s.color}18`, border: `1px solid ${s.color}40`, borderRadius: 8, padding: '5px 10px', color: s.color, fontSize: 11, fontWeight: 700, cursor: 'pointer', outline: 'none', fontFamily: 'inherit' }}
                           >
                             {STAGES.map(st => <option key={st.key} value={st.key} style={{ background: T.card, color: T.text }}>{st.label}</option>)}
                           </select>
                         </td>
-                        <td style={{ padding: '16px 20px' }}>
-                          <span style={{ fontSize: 14, fontWeight: 800, color: lead.stage === 'won' ? T.success : T.text }}>${lead.value}<span style={{ fontSize: 10, opacity: 0.5 }}>/mo</span></span>
+                        <td style={{ padding: '10px 14px', minWidth: 80 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <span style={{ fontSize: 12, color: T.textDim, marginRight: 1 }}>$</span>
+                            <EC field="value" val={lead.value} num bold />
+                          </div>
                         </td>
-                        <td style={{ padding: '16px 20px', maxWidth: 200 }}>
-                          <div style={{ fontSize: 12, color: T.textMuted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{lead.notes || '—'}</div>
-                        </td>
-                        <td style={{ padding: '16px 20px' }}>
-                          <div style={{ display: 'flex', gap: 8 }}>
+                        <td style={{ padding: '10px 14px', maxWidth: 180 }}><EC field="notes" val={lead.notes} /></td>
+                        <td style={{ padding: '10px 14px' }}>
+                          <div style={{ display: 'flex', gap: 6 }}>
                             {lead.stage !== 'won' && lead.stage !== 'lost' && (
-                              <button onClick={() => updateLeadStage(lead.id, 'won')} style={{ background: T.successDim, border: '1px solid rgba(16,185,129,0.25)', borderRadius: 7, padding: '6px 10px', color: T.success, fontSize: 11, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>Mark Won</button>
+                              <button onClick={() => updateLeadStage(lead.id, 'won')} style={{ background: T.successDim, border: '1px solid rgba(16,185,129,0.25)', borderRadius: 7, padding: '5px 10px', color: T.success, fontSize: 11, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>Won</button>
                             )}
-                            <button onClick={() => deleteLead(lead.id)} style={{ background: T.errorDim, border: '1px solid rgba(239,68,68,0.15)', borderRadius: 7, padding: '6px 10px', color: T.error, fontSize: 11, cursor: 'pointer' }}>✕</button>
+                            <button onClick={() => deleteLead(lead.id)} style={{ background: T.errorDim, border: '1px solid rgba(239,68,68,0.15)', borderRadius: 7, padding: '5px 8px', color: T.error, fontSize: 11, cursor: 'pointer' }}>✕</button>
                           </div>
                         </td>
                       </tr>
@@ -840,13 +882,17 @@ export default function AdminPage() {
 
   // ── Shell ─────────────────────────────────────────────────────────────────
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: T.bg, color: T.text, fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: T.bg, color: T.text, fontFamily: 'var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' }}>
 
       {/* ── Sidebar ── */}
       <div style={{ width: 240, background: T.sidebar, borderRight: `1px solid ${T.border}`, display: 'flex', flexDirection: 'column', position: 'fixed', top: 0, bottom: 0, left: 0, zIndex: 100 }}>
-        {/* Logo */}
+        {/* Logo — click to open landing page */}
         <div style={{ padding: '28px 20px 24px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div
+            onClick={() => window.open('/', '_blank')}
+            title="View landing page"
+            style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}
+          >
             <div style={{ width: 38, height: 38, background: T.accent, borderRadius: 11, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 14, color: '#000', flexShrink: 0 }}>MJ</div>
             <div>
               <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: 0.5 }}>MJ AGENCY</div>
