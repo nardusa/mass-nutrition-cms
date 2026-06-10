@@ -67,7 +67,7 @@ function LoginForm() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#070B14', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, position: 'relative', overflow: 'hidden' }}>
+    <div style={{ minHeight: '100vh', background: '#050A12', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, position: 'relative', overflow: 'hidden' }}>
       {/* Background glow */}
       <div style={{
         position: 'fixed', top: -300, left: '50%', transform: 'translateX(-50%)',
@@ -78,13 +78,13 @@ function LoginForm() {
       {/* Grid lines */}
       <div style={{
         position: 'fixed', inset: 0, pointerEvents: 'none',
-        backgroundImage: `linear-gradient(rgba(14,165,233,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(14,165,233,0.03) 1px, transparent 1px)`,
-        backgroundSize: '60px 60px',
+        backgroundImage: `linear-gradient(rgba(14,165,233,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(14,165,233,0.025) 1px, transparent 1px)`,
+        backgroundSize: '72px 72px',
       }} />
 
       <div style={{
         position: 'relative', zIndex: 1, width: '100%', maxWidth: 420,
-        background: '#0D1525',
+        background: '#0A1020',
         border: `1px solid ${clientData ? brand.primary + '35' : 'rgba(14,165,233,0.18)'}`,
         borderRadius: 20, padding: '48px 40px',
         boxShadow: `0 0 60px ${brand.primary}12, 0 24px 64px rgba(0,0,0,0.5)`,
@@ -145,11 +145,7 @@ function LoginForm() {
           </button>
         </form>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '28px 0' }}>
-          <div style={{ flex: 1, height: 1, background: 'rgba(14,165,233,0.1)' }} />
-          <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)', fontWeight: 700, letterSpacing: 1.5 }}>SECURE LOGIN</div>
-          <div style={{ flex: 1, height: 1, background: 'rgba(14,165,233,0.1)' }} />
-        </div>
+        <div style={{ height: 1, background: 'rgba(255,255,255,0.05)', margin: '28px 0' }} />
 
         <div style={{ textAlign: 'center', fontSize: 12, color: 'rgba(255,255,255,0.2)' }}>
           {clientData

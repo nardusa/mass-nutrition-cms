@@ -471,9 +471,8 @@ export default function AdminPage() {
                     <td style={{ padding: '16px 20px' }}>
                       <div style={{ display: 'flex', gap: 6 }}>
                         <button onClick={() => router.push(`/editor?clientId=${client.id}`)} style={{ background: 'rgba(14,165,233,0.12)', border: '1px solid rgba(14,165,233,0.25)', borderRadius: 8, padding: '7px 12px', color: '#0EA5E9', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Edit</button>
-                        <button onClick={() => setLinksClient(client)} style={{ background: 'rgba(255,215,0,0.08)', border: '1px solid rgba(255,215,0,0.2)', borderRadius: 8, padding: '7px 12px', color: '#FFD700', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Links</button>
-                        <button onClick={() => setOwner(client)} title="Set as site owner" style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)', borderRadius: 8, padding: '7px 10px', color: '#22C55E', fontSize: 13, cursor: 'pointer' }}>👑</button>
-                        <button onClick={() => deleteClient(client.id, client.business_name)} style={{ background: 'rgba(255,59,59,0.08)', border: '1px solid rgba(255,59,59,0.2)', borderRadius: 8, padding: '7px 12px', color: '#ff6b6b', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Del</button>
+                        <button onClick={() => setLinksClient(client)} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, padding: '7px 12px', color: 'rgba(255,255,255,0.6)', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Links</button>
+                        <button onClick={() => deleteClient(client.id, client.business_name)} style={{ background: 'rgba(255,59,59,0.06)', border: '1px solid rgba(255,59,59,0.15)', borderRadius: 8, padding: '7px 10px', color: '#ff6b6b', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>✕</button>
                       </div>
                     </td>
                   </tr>
@@ -789,10 +788,10 @@ export default function AdminPage() {
           style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 20 }}
           onClick={e => e.target === e.currentTarget && setShowModal(false)}
         >
-          <div style={{ background: '#0D1525', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 20, padding: '40px', width: '100%', maxWidth: 500, maxHeight: '90vh', overflowY: 'auto' }}>
+          <div style={{ background: '#0A1020', border: '1px solid rgba(14,165,233,0.15)', borderRadius: 20, padding: '40px', width: '100%', maxWidth: 500, maxHeight: '90vh', overflowY: 'auto' }}>
             {successClient ? (
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 56, marginBottom: 16 }}>✓</div>
+                <div style={{ width: 72, height: 72, background: 'rgba(14,165,233,0.1)', border: '2px solid rgba(14,165,233,0.35)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, margin: '0 auto 20px', boxShadow: '0 0 32px rgba(14,165,233,0.12)' }}>✓</div>
                 <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>{successClient.name} added!</div>
                 <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)', marginBottom: 28 }}>Send these two links to your client in order</div>
 
@@ -807,11 +806,11 @@ export default function AdminPage() {
                   </div>
                 )}
                 <div style={{ textAlign: 'left', marginBottom: 12 }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: '#22C55E', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 8 }}>Step 1 — Send first (intake form)</div>
-                  <div style={{ background: '#0F1929', border: '1px solid rgba(34,197,94,0.3)', borderRadius: 12, padding: '14px 16px', marginBottom: 8, wordBreak: 'break-all', fontSize: 13, color: '#22C55E', fontFamily: 'monospace' }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#0EA5E9', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 8 }}>Step 1 — Send first (intake form)</div>
+                  <div style={{ background: '#0F1929', border: '1px solid rgba(14,165,233,0.2)', borderRadius: 12, padding: '14px 16px', marginBottom: 8, wordBreak: 'break-all', fontSize: 13, color: '#0EA5E9', fontFamily: 'monospace' }}>
                     {successClient.intakeUrl}
                   </div>
-                  <button onClick={() => { navigator.clipboard.writeText(successClient.intakeUrl); showToast('Intake link copied!') }} style={{ width: '100%', background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.3)', borderRadius: 10, padding: '12px', color: '#22C55E', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                  <button onClick={() => { navigator.clipboard.writeText(successClient.intakeUrl); showToast('Intake link copied!') }} style={{ width: '100%', background: 'rgba(14,165,233,0.08)', border: '1px solid rgba(14,165,233,0.25)', borderRadius: 10, padding: '12px', color: '#0EA5E9', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
                     Copy Intake Form Link
                   </button>
                 </div>

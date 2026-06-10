@@ -47,8 +47,9 @@ export default function ChangePasswordPage() {
   )
 
   return (
-    <div style={{ minHeight: '100vh', background: '#080C14', color: '#fff', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-      <div style={{ width: '100%', maxWidth: 420, background: '#0D1525', border: '1px solid rgba(14,165,233,0.15)', borderRadius: 20, padding: '48px 40px' }}>
+    <div style={{ minHeight: '100vh', background: '#050A12', color: '#fff', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, position: 'relative', overflow: 'hidden' }}>
+      <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', backgroundImage: 'linear-gradient(rgba(14,165,233,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(14,165,233,0.025) 1px, transparent 1px)', backgroundSize: '72px 72px' }} />
+      <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: 420, background: '#0A1020', border: '1px solid rgba(14,165,233,0.15)', borderRadius: 20, padding: '48px 40px' }}>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 36 }}>
           <div style={{ width: 34, height: 34, background: 'linear-gradient(135deg,#0EA5E9,#0284C7)', borderRadius: 9, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 12, boxShadow: '0 0 16px rgba(14,165,233,0.35)' }}>MJ</div>
