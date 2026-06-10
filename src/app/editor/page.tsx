@@ -74,6 +74,7 @@ function EditorInner() {
   const [editingProduct, setEditingProduct] = useState<Partial<Product> | null>(null)
   const [isAdmin, setIsAdmin] = useState(false)
   const [uploadingImage, setUploadingImage] = useState(false)
+  const [siteUrl, setSiteUrl] = useState('')
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(''), 3000) }
   const set = (key: keyof SiteContent, val: string) => setContent(c => ({ ...c, [key]: val }))
@@ -84,7 +85,7 @@ function EditorInner() {
       supabase.from('site_content').select('*').eq('client_id', cid).single(),
       supabase.from('products').select('*').eq('client_id', cid).order('display_order'),
     ])
-    if (clientData) setClient(clientData)
+    if (clientData) { setClient(clientData); setSiteUrl(clientData.site_url || '') }
     if (contentData) setContent(contentData)
     if (productsData) setProducts(productsData)
     setLoading(false)
@@ -110,7 +111,11 @@ function EditorInner() {
       .from('site_content')
       .upsert({ ...content, client_id: cid, updated_at: new Date().toISOString() })
     if (error) showToast('Error: ' + error.message)
-    else { setSaved(true); setTimeout(() => setSaved(false), 2500) }
+    else {
+      if (cid) await supabase.from('clients').update({ site_url: siteUrl }).eq('id', cid)
+      setSaved(true)
+      setTimeout(() => setSaved(false), 2500)
+    }
     setSaving(false)
   }
 
@@ -149,8 +154,8 @@ function EditorInner() {
     showToast('Product deleted')
   }
 
-  const brandColor  = isAdmin ? '#ffffff' : (content.primary_color  || client?.portal_color  || '#ffffff')
-  const brandColor2 = isAdmin ? 'rgba(255,255,255,0.7)' : (content.accent_color   || client?.portal_accent || brandColor)
+  const brandColor  = isAdmin ? '#F59E0B' : (content.primary_color  || client?.portal_color  || '#ffffff')
+  const brandColor2 = isAdmin ? '#FCD34D' : (content.accent_color   || client?.portal_accent || brandColor)
   const brandLetter = isAdmin ? 'MJ'      : (client?.logo_letter    || client?.business_name?.[0]?.toUpperCase() || 'C')
   const brandName   = isAdmin ? 'MJ Agency' : (client?.business_name || 'Your Brand')
 
@@ -170,7 +175,7 @@ function EditorInner() {
         {/* Brand header */}
         <div style={{ padding: '24px 20px 20px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: client && isAdmin ? 16 : 0 }}>
-            <div style={{ width: 38, height: 38, background: isAdmin ? '#fff' : `linear-gradient(135deg,${brandColor},${brandColor2})`, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: brandLetter.length > 1 ? 12 : 16, boxShadow: isAdmin ? 'none' : `0 0 20px ${brandColor}35`, flexShrink: 0, color: isAdmin ? '#000' : '#fff' }}>
+            <div style={{ width: 38, height: 38, background: isAdmin ? '#F59E0B' : `linear-gradient(135deg,${brandColor},${brandColor2})`, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: brandLetter.length > 1 ? 12 : 16, boxShadow: `0 0 20px ${brandColor}40`, flexShrink: 0, color: '#000' }}>
               {brandLetter}
             </div>
             <div style={{ overflow: 'hidden' }}>
@@ -258,7 +263,7 @@ function EditorInner() {
             onClick={saveContent}
             disabled={saving}
             style={{
-              background: saved ? 'rgba(255,255,255,0.08)' : (isAdmin ? '#fff' : `linear-gradient(135deg,${brandColor},${brandColor2})`),
+              background: saved ? 'rgba(255,255,255,0.08)' : (isAdmin ? '#F59E0B' : `linear-gradient(135deg,${brandColor},${brandColor2})`),
               border: saved ? '1px solid rgba(255,255,255,0.15)' : 'none',
               borderRadius: 10, padding: '10px 24px',
               color: saved ? 'rgba(255,255,255,0.7)' : (isAdmin ? '#000' : '#fff'),
@@ -425,6 +430,18 @@ function EditorInner() {
             {/* ── SOCIAL ── */}
             {tab === 'Social' && (
               <>
+                <SectionCard title="Live Site" desc="The public URL where this site is hosted">
+                  <Field label="Live Site URL" hint="Saved separately from other content">
+                    <input
+                      style={inp({ marginBottom: 0 })}
+                      type="url"
+                      value={siteUrl}
+                      onChange={e => setSiteUrl(e.target.value)}
+                      placeholder="https://yourclientsite.com"
+                    />
+                  </Field>
+                </SectionCard>
+
                 <SectionCard title="Contact" desc="How customers reach you">
                   <Field label="Email">
                     <input style={inp()} type="email" value={content.contact_email || ''} onChange={e => set('contact_email', e.target.value)} placeholder="hello@yourbrand.com" />
