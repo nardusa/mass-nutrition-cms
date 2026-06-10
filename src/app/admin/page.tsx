@@ -110,6 +110,7 @@ export default function AdminPage() {
   const [showImportModal, setShowImportModal] = useState(false)
   const [importRows, setImportRows] = useState<Partial<PipelineLead>[]>([])
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
+  const [hasLocalLeads, setHasLocalLeads] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const [form, setForm] = useState({
@@ -149,6 +150,36 @@ export default function AdminPage() {
       .order('created_at', { ascending: false })
     if (data) setLeads(data.map(r => ({ ...r, createdAt: r.created_at })))
   }, [])
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('mj_pipeline')
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        if (Array.isArray(parsed) && parsed.length > 0) setHasLocalLeads(true)
+      }
+    } catch { /* no-op */ }
+  }, [])
+
+  async function migrateLocalLeads() {
+    try {
+      const saved = localStorage.getItem('mj_pipeline')
+      if (!saved) return
+      const local: PipelineLead[] = JSON.parse(saved)
+      if (!local.length) return
+      const rows = local.map(l => ({
+        name: l.name, business: l.business, email: l.email, phone: l.phone,
+        stage: l.stage, value: l.value, notes: l.notes,
+        created_at: l.createdAt || new Date().toISOString(),
+      }))
+      const { error } = await supabase.from('pipeline_leads').insert(rows)
+      if (error) { showToast('Migration failed: ' + error.message, 'error'); return }
+      localStorage.removeItem('mj_pipeline')
+      setHasLocalLeads(false)
+      await loadLeads()
+      showToast(`Migrated ${rows.length} lead${rows.length !== 1 ? 's' : ''} to cloud ✓`)
+    } catch { showToast('Migration failed', 'error') }
+  }
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -641,6 +672,17 @@ export default function AdminPage() {
             </button>
           </div>
         </div>
+
+        {hasLocalLeads && (
+          <div style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.3)', borderRadius: 12, padding: '14px 18px', marginBottom: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+            <div style={{ fontSize: 13, color: T.accentText }}>
+              Local leads found on this device — migrate them to the cloud so they appear everywhere.
+            </div>
+            <button onClick={migrateLocalLeads} style={{ background: T.accent, border: 'none', borderRadius: 8, padding: '8px 18px', color: '#000', fontSize: 13, fontWeight: 800, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+              Migrate to Cloud →
+            </button>
+          </div>
+        )}
 
         <div className="admin-kpis" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16, marginBottom: 28 }}>
           <KPI label="Pipeline Value" value={`$${pipelineValue.toLocaleString()}`} sub="projected MRR from leads" color="#F59E0B" icon="💼" />
