@@ -420,7 +420,7 @@ export default function AdminPage() {
   function renderDashboard() {
     return (
       <>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 36 }}>
+        <div className="admin-section-hdr" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 36 }}>
           <div>
             <div style={{ fontSize: 11, fontWeight: 700, color: T.textDim, letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 6 }}>Overview</div>
             <h1 style={{ fontSize: 32, fontWeight: 900, margin: 0, letterSpacing: -1 }}>Dashboard</h1>
@@ -431,7 +431,7 @@ export default function AdminPage() {
         </div>
 
         {/* KPIs */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16, marginBottom: 28 }}>
+        <div className="admin-kpis" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16, marginBottom: 28 }}>
           <KPI label="Monthly Revenue"  value={`$${mrr.toLocaleString()}`}  sub={`$${arr.toLocaleString()} ARR`}                color={T.accentText} icon="💰" />
           <KPI label="Active Clients"   value={stats.active}                sub={`${stats.total} total`}                          color={T.success}    icon="✓"  />
           <KPI label="Pipeline Value"   value={`$${pipelineValue.toLocaleString()}`} sub={`${activeLeads} active lead${activeLeads !== 1 ? 's' : ''}`} color="#F59E0B" icon="▷" />
@@ -439,7 +439,7 @@ export default function AdminPage() {
         </div>
 
         {/* Revenue breakdown + Recent clients */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.6fr', gap: 20, marginBottom: 20 }}>
+        <div className="admin-rev-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1.6fr', gap: 20, marginBottom: 20 }}>
           {/* Revenue by plan */}
           <div style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 16, padding: 28 }}>
             <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 22, color: T.text }}>Revenue by Plan</div>
@@ -540,15 +540,16 @@ export default function AdminPage() {
   function renderClients() {
     return (
       <>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 36 }}>
+        <div className="admin-section-hdr" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 36 }}>
           <div>
             <div style={{ fontSize: 11, fontWeight: 700, color: T.textDim, letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 6 }}>Management</div>
             <h1 style={{ fontSize: 32, fontWeight: 900, margin: 0, letterSpacing: -1 }}>Clients</h1>
           </div>
-          <div style={{ display: 'flex', gap: 12 }}>
+          <div className="admin-header-actions" style={{ display: 'flex', gap: 10 }}>
             <div style={{ position: 'relative' }}>
               <input
-                style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 10, padding: '10px 16px 10px 40px', color: T.text, fontSize: 13, width: 240, outline: 'none', fontFamily: 'inherit' }}
+                className="admin-search-input"
+                style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 10, padding: '10px 16px 10px 40px', color: T.text, fontSize: 13, width: 220, outline: 'none', fontFamily: 'inherit' }}
                 placeholder="Search clients…" value={search} onChange={e => setSearch(e.target.value)}
               />
               <span style={{ position: 'absolute', left: 13, top: '50%', transform: 'translateY(-50%)', fontSize: 14, opacity: 0.3, pointerEvents: 'none' }}>⌕</span>
@@ -623,14 +624,14 @@ export default function AdminPage() {
   function renderPipeline() {
     return (
       <>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 36 }}>
+        <div className="admin-section-hdr" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 36 }}>
           <div>
             <div style={{ fontSize: 11, fontWeight: 700, color: T.textDim, letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 6 }}>Sales</div>
             <h1 style={{ fontSize: 32, fontWeight: 900, margin: 0, letterSpacing: -1 }}>Pipeline</h1>
           </div>
-          <div style={{ display: 'flex', gap: 10 }}>
+          <div className="admin-header-actions" style={{ display: 'flex', gap: 10 }}>
             <button onClick={() => fileInputRef.current?.click()} style={{ background: 'rgba(255,255,255,0.06)', border: `1px solid ${T.borderStrong}`, borderRadius: 12, padding: '13px 20px', color: T.textMuted, fontSize: 14, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
-              ⬆ Import CSV
+              ⬆ CSV
             </button>
             <button onClick={() => setShowLeadModal(true)} style={{ background: T.accent, border: 'none', borderRadius: 12, padding: '13px 24px', color: '#000', fontSize: 14, fontWeight: 800, cursor: 'pointer' }}>
               + Add Lead
@@ -638,7 +639,7 @@ export default function AdminPage() {
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16, marginBottom: 28 }}>
+        <div className="admin-kpis" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16, marginBottom: 28 }}>
           <KPI label="Pipeline Value" value={`$${pipelineValue.toLocaleString()}`} sub="projected MRR from leads" color="#F59E0B" icon="💼" />
           <KPI label="Active Leads"   value={activeLeads} sub={`${leads.length} total in pipeline`} color={T.accentText} icon="▷" />
           <KPI label="Deals Won"      value={wonLeads} sub={wonLeads > 0 ? `$${leads.filter(l=>l.stage==='won').reduce((s,l)=>s+l.value,0).toLocaleString()}/mo closed` : 'none yet'} color={T.success} icon="✓" />
@@ -848,14 +849,14 @@ export default function AdminPage() {
           <h1 style={{ fontSize: 32, fontWeight: 900, margin: 0, letterSpacing: -1 }}>Analytics</h1>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16, marginBottom: 28 }}>
+        <div className="admin-kpis" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16, marginBottom: 28 }}>
           <KPI label="MRR"                value={`$${mrr.toLocaleString()}`}  sub="monthly recurring"      color={T.accentText} icon="💰" />
           <KPI label="ARR"                value={`$${arr.toLocaleString()}`}  sub="annual run rate"         color="#F59E0B"      icon="📈" />
           <KPI label="Active Clients"     value={stats.active}               sub={`${stats.inactive} inactive`} color={T.success} icon="✓" />
           <KPI label="Avg / Client"       value={stats.active > 0 ? `$${Math.round(mrr / stats.active)}` : '—'} sub="per active client/mo" color="#8B5CF6" icon="⭐" />
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 20 }}>
+        <div className="admin-rev-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 20 }}>
           <div style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 16, padding: 28 }}>
             <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 24 }}>Plan Distribution</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
@@ -1337,8 +1338,14 @@ export default function AdminPage() {
         @media (max-width: 768px) {
           .admin-sidebar { transform: translateX(-100%); transition: transform 0.22s ease; }
           .admin-sidebar.open { transform: translateX(0) !important; }
-          .admin-main { margin-left: 0 !important; padding: 20px 16px !important; }
+          .admin-main { margin-left: 0 !important; padding: 20px 16px 80px !important; }
           .admin-hamburger { display: flex !important; }
+          .admin-kpis { grid-template-columns: repeat(2,1fr) !important; gap: 10px !important; }
+          .admin-rev-grid { grid-template-columns: 1fr !important; }
+          .admin-header-actions { flex-wrap: wrap !important; width: 100%; }
+          .admin-header-actions .admin-search-input { width: 100% !important; }
+          .admin-section-hdr { flex-direction: column !important; gap: 14px !important; margin-bottom: 24px !important; }
+          .admin-section-hdr h1 { font-size: 26px !important; }
         }
       `}</style>
     </div>
