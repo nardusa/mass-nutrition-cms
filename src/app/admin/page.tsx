@@ -222,12 +222,18 @@ export default function AdminPage() {
   async function saveAgency() {
     const content = agencyContent ?? DEFAULT_AGENCY
     setAgencySaving(true)
-    const { error } = await supabase
+    // Strip empty id so Postgres generates the UUID on first insert
+    const { id, ...fields } = content
+    const payload = id ? { ...content, updated_at: new Date().toISOString() } : { ...fields, updated_at: new Date().toISOString() }
+    const { data, error } = await supabase
       .from('agency_content')
-      .upsert({ ...content, updated_at: new Date().toISOString() })
+      .upsert(payload)
+      .select()
+      .single()
     setAgencySaving(false)
-    if (error) showToast('Error: ' + error.message, 'error')
-    else showToast('Agency site updated ✓')
+    if (error) { showToast('Error: ' + error.message, 'error'); return }
+    if (data) setAgencyContent(data)
+    showToast('Agency site updated ✓')
   }
 
   useEffect(() => {

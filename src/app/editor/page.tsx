@@ -375,12 +375,12 @@ function EditorInner() {
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                     {products.map(p => (
-                      <div key={p.id} style={{ background: '#0A1020', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 14, padding: '14px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16 }}>
+                      <div key={p.id} style={{ background: '#0A1020', border: `1px solid ${brandColor}18`, borderRadius: 14, padding: '14px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                          <div style={{ width: 44, height: 44, borderRadius: 10, background: '#060D1A', border: '1px solid rgba(255,255,255,0.06)', flexShrink: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>
+                          <div style={{ width: 44, height: 44, borderRadius: 10, background: `${brandColor}18`, border: `1px solid ${brandColor}30`, flexShrink: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>
                             {p.image_url
                               ? <img src={p.image_url} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                              : '▦'
+                              : <span style={{ color: brandColor, opacity: 0.7 }}>▦</span>
                             }
                           </div>
                           <div>
