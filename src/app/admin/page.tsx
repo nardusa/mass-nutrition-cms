@@ -142,6 +142,14 @@ export default function AdminPage() {
     setIntakes(data || [])
   }, [])
 
+  const loadLeads = useCallback(async () => {
+    const { data } = await supabase
+      .from('pipeline_leads')
+      .select('*')
+      .order('created_at', { ascending: false })
+    if (data) setLeads(data.map(r => ({ ...r, createdAt: r.created_at })))
+  }, [])
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session) { router.replace('/login'); return }
@@ -150,17 +158,9 @@ export default function AdminPage() {
       if (email !== process.env.NEXT_PUBLIC_ADMIN_EMAIL) { router.replace('/editor'); return }
       loadClients()
       loadIntakes()
+      loadLeads()
     })
-    try {
-      const saved = localStorage.getItem('mj_pipeline')
-      if (saved) setLeads(JSON.parse(saved))
-    } catch { /* no-op */ }
-  }, [router, loadClients, loadIntakes])
-
-  function savePipeline(next: PipelineLead[]) {
-    setLeads(next)
-    localStorage.setItem('mj_pipeline', JSON.stringify(next))
-  }
+  }, [router, loadClients, loadIntakes, loadLeads])
 
   function updateForm(key: string, value: string) {
     setForm(f => {
@@ -263,24 +263,29 @@ export default function AdminPage() {
     loadIntakes()
   }
 
-  function addLead() {
-    const lead: PipelineLead = {
-      id: Date.now().toString(), ...leadForm,
-      value: Number(leadForm.value) || 149,
-      createdAt: new Date().toISOString(),
+  async function addLead() {
+    const row = {
+      name: leadForm.name, business: leadForm.business,
+      email: leadForm.email, phone: leadForm.phone,
+      stage: leadForm.stage, value: Number(leadForm.value) || 149,
+      notes: leadForm.notes,
     }
-    savePipeline([lead, ...leads])
+    const { data, error } = await supabase.from('pipeline_leads').insert(row).select().single()
+    if (error) { showToast('Error: ' + error.message, 'error'); return }
+    setLeads(prev => [{ ...data, createdAt: data.created_at }, ...prev])
     setLeadForm({ name: '', business: '', email: '', phone: '', stage: 'lead', value: '149', notes: '' })
     setShowLeadModal(false)
     showToast('Lead added to pipeline')
   }
 
-  function updateLeadStage(id: string, stage: PipelineLead['stage']) {
-    savePipeline(leads.map(l => l.id === id ? { ...l, stage } : l))
+  async function updateLeadStage(id: string, stage: PipelineLead['stage']) {
+    setLeads(prev => prev.map(l => l.id === id ? { ...l, stage } : l))
+    await supabase.from('pipeline_leads').update({ stage }).eq('id', id)
   }
 
-  function deleteLead(id: string) {
-    savePipeline(leads.filter(l => l.id !== id))
+  async function deleteLead(id: string) {
+    setLeads(prev => prev.filter(l => l.id !== id))
+    await supabase.from('pipeline_leads').delete().eq('id', id)
     showToast('Lead removed')
   }
 
@@ -289,11 +294,11 @@ export default function AdminPage() {
     setEditVal(val)
   }
 
-  function commitEdit() {
+  async function commitEdit() {
     if (!editCell) return
-    savePipeline(leads.map(l => l.id !== editCell.id ? l : {
-      ...l, [editCell.field]: editCell.field === 'value' ? (Number(editVal) || 0) : editVal,
-    }))
+    const value = editCell.field === 'value' ? (Number(editVal) || 0) : editVal
+    setLeads(prev => prev.map(l => l.id !== editCell.id ? l : { ...l, [editCell.field]: value }))
+    await supabase.from('pipeline_leads').update({ [editCell.field]: value }).eq('id', editCell.id)
     setEditCell(null)
   }
 
@@ -356,22 +361,20 @@ export default function AdminPage() {
     e.target.value = ''
   }
 
-  function confirmImport() {
-    const newLeads: PipelineLead[] = importRows.map((row, i) => ({
-      id: `import_${Date.now()}_${i}`,
-      business:  row.business || '',
-      name:      row.name     || '',
-      email:     row.email    || '',
-      phone:     row.phone    || '',
-      stage:     'lead',
-      value:     Number(row.value) || 149,
-      notes:     row.notes    || '',
-      createdAt: new Date().toISOString(),
+  async function confirmImport() {
+    const rows = importRows.map(row => ({
+      business: row.business || '', name: row.name || '',
+      email: row.email || '', phone: row.phone || '',
+      stage: 'lead' as const, value: Number(row.value) || 149,
+      notes: row.notes || '',
     }))
-    savePipeline([...newLeads, ...leads])
+    const { data, error } = await supabase.from('pipeline_leads').insert(rows).select()
+    if (error) { showToast('Import failed: ' + error.message, 'error'); return }
+    const imported = (data || []).map(r => ({ ...r, createdAt: r.created_at }))
+    setLeads(prev => [...imported, ...prev])
     setShowImportModal(false)
     setImportRows([])
-    showToast(`Imported ${newLeads.length} lead${newLeads.length !== 1 ? 's' : ''}`)
+    showToast(`Imported ${imported.length} lead${imported.length !== 1 ? 's' : ''}`)
   }
 
   // ── Computed ──────────────────────────────────────────────────────────────
