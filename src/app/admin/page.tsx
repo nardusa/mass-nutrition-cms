@@ -109,6 +109,7 @@ export default function AdminPage() {
   const [editVal, setEditVal]   = useState('')
   const [showImportModal, setShowImportModal] = useState(false)
   const [importRows, setImportRows] = useState<Partial<PipelineLead>[]>([])
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const [form, setForm] = useState({
@@ -969,8 +970,13 @@ export default function AdminPage() {
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: T.bg, color: T.text, fontFamily: 'var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' }}>
 
+      {/* ── Mobile overlay ── */}
+      {mobileNavOpen && (
+        <div onClick={() => setMobileNavOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)', zIndex: 99 }} />
+      )}
+
       {/* ── Sidebar ── */}
-      <div style={{ width: 240, background: T.sidebar, borderRight: `1px solid ${T.border}`, display: 'flex', flexDirection: 'column', position: 'fixed', top: 0, bottom: 0, left: 0, zIndex: 100 }}>
+      <div className={`admin-sidebar${mobileNavOpen ? ' open' : ''}`} style={{ width: 240, background: T.sidebar, borderRight: `1px solid ${T.border}`, display: 'flex', flexDirection: 'column', position: 'fixed', top: 0, bottom: 0, left: 0, zIndex: 100 }}>
         {/* Logo — click to open landing page */}
         <div style={{ padding: '28px 20px 24px' }}>
           <div
@@ -994,7 +1000,7 @@ export default function AdminPage() {
             return (
               <div
                 key={item.label}
-                onClick={() => setSection(item.label)}
+                onClick={() => { setSection(item.label); setMobileNavOpen(false) }}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px',
                   borderRadius: 10, marginBottom: 2,
@@ -1041,7 +1047,15 @@ export default function AdminPage() {
       </div>
 
       {/* ── Main content ── */}
-      <div style={{ flex: 1, marginLeft: 240, padding: '44px 52px', overflowY: 'auto', minHeight: '100vh', backgroundImage: 'linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px)', backgroundSize: '72px 72px' }}>
+      <div className="admin-main" style={{ flex: 1, marginLeft: 240, padding: '44px 52px', overflowY: 'auto', minHeight: '100vh', backgroundImage: 'linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px)', backgroundSize: '72px 72px' }}>
+        {/* Mobile hamburger */}
+        <button
+          className="admin-hamburger"
+          onClick={() => setMobileNavOpen(o => !o)}
+          style={{ display: 'none', alignItems: 'center', gap: 10, background: T.card, border: `1px solid ${T.border}`, borderRadius: 10, padding: '10px 16px', color: T.text, fontSize: 13, fontWeight: 700, cursor: 'pointer', marginBottom: 24, fontFamily: 'inherit' }}
+        >
+          <span style={{ fontSize: 16 }}>☰</span> Menu
+        </button>
         {section === 'Dashboard' && renderDashboard()}
         {section === 'Clients'   && renderClients()}
         {section === 'Pipeline'  && renderPipeline()}
@@ -1320,6 +1334,12 @@ export default function AdminPage() {
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.14); }
+        @media (max-width: 768px) {
+          .admin-sidebar { transform: translateX(-100%); transition: transform 0.22s ease; }
+          .admin-sidebar.open { transform: translateX(0) !important; }
+          .admin-main { margin-left: 0 !important; padding: 20px 16px !important; }
+          .admin-hamburger { display: flex !important; }
+        }
       `}</style>
     </div>
   )

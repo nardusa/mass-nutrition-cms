@@ -55,22 +55,25 @@ export default function HomePage() {
       <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0, backgroundImage: 'linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)', backgroundSize: '72px 72px' }} />
 
       {/* Nav */}
-      <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(8,8,8,0.85)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(255,255,255,0.06)', padding: '0 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 60 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+      <nav className="lp-nav" style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(8,8,8,0.85)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(255,255,255,0.06)', padding: '0 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 60 }}>
+        <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', color: 'inherit' }}>
           <div style={{ width: 32, height: 32, background: '#F59E0B', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 12, letterSpacing: 0.5, color: '#000' }}>MJ</div>
           <span style={{ fontWeight: 800, fontSize: 15, letterSpacing: 0.2 }}>MJ Agency</span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+        </a>
+        <div className="lp-nav-links" style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
           <a href="#work" style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', textDecoration: 'none', fontWeight: 600 }}>Work</a>
           <a href="#pricing" style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', textDecoration: 'none', fontWeight: 600 }}>Pricing</a>
           <a href="/login" style={{ background: '#F59E0B', borderRadius: 8, padding: '7px 16px', color: '#000', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>
             Client Login
           </a>
         </div>
+        <a className="lp-nav-mobile-btn" href="/login" style={{ display: 'none', background: '#F59E0B', borderRadius: 8, padding: '7px 14px', color: '#000', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>
+          Login
+        </a>
       </nav>
 
       {/* Hero */}
-      <section style={{ position: 'relative', zIndex: 1, padding: '120px 40px 100px', maxWidth: 1100, margin: '0 auto', textAlign: 'center' }}>
+      <section className="lp-hero" style={{ position: 'relative', zIndex: 1, padding: '120px 40px 100px', maxWidth: 1100, margin: '0 auto', textAlign: 'center' }}>
         <div style={{ position: 'absolute', top: -60, left: '50%', transform: 'translateX(-50%)', width: 900, height: 700, background: 'radial-gradient(ellipse, rgba(255,255,255,0.03) 0%, transparent 65%)', pointerEvents: 'none' }} />
 
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 100, padding: '6px 16px', fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.7)', letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 36 }}>
@@ -98,8 +101,8 @@ export default function HomePage() {
       </section>
 
       {/* Stats bar */}
-      <div style={{ position: 'relative', zIndex: 1, borderTop: '1px solid rgba(255,255,255,0.05)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-        <div style={{ maxWidth: 900, margin: '0 auto', padding: '40px', display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', gap: 32 }}>
+      <div className="lp-stats" style={{ position: 'relative', zIndex: 1, borderTop: '1px solid rgba(255,255,255,0.05)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+        <div className="lp-stats-inner" style={{ maxWidth: 900, margin: '0 auto', padding: '40px', display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', gap: 32 }}>
           {[
             { val: '7-Day', label: 'Average delivery' },
             { val: '100%', label: 'Mobile optimized' },
@@ -115,8 +118,8 @@ export default function HomePage() {
       </div>
 
       {/* How it works */}
-      <section style={{ position: 'relative', zIndex: 1, padding: '100px 40px', maxWidth: 1100, margin: '0 auto' }}>
-        <div style={{ textAlign: 'center', marginBottom: 64 }}>
+      <section className="lp-section-top" style={{ position: 'relative', zIndex: 1, padding: '100px 40px', maxWidth: 1100, margin: '0 auto' }}>
+        <div className="lp-section-hdr" style={{ textAlign: 'center', marginBottom: 64 }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 14 }}>The Process</div>
           <h2 style={{ fontSize: 'clamp(28px, 4vw, 42px)', fontWeight: 900, margin: 0, letterSpacing: -0.5 }}>Simple from start to finish</h2>
         </div>
@@ -136,8 +139,8 @@ export default function HomePage() {
       </section>
 
       {/* What we build */}
-      <section style={{ position: 'relative', zIndex: 1, padding: '0 40px 100px', maxWidth: 1100, margin: '0 auto' }}>
-        <div style={{ textAlign: 'center', marginBottom: 64 }}>
+      <section className="lp-section" style={{ position: 'relative', zIndex: 1, padding: '0 40px 100px', maxWidth: 1100, margin: '0 auto' }}>
+        <div className="lp-section-hdr" style={{ textAlign: 'center', marginBottom: 64 }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 14 }}>What We Build</div>
           <h2 style={{ fontSize: 'clamp(28px, 4vw, 42px)', fontWeight: 900, margin: 0, letterSpacing: -0.5 }}>Everything your business needs online</h2>
         </div>
@@ -157,8 +160,8 @@ export default function HomePage() {
       </section>
 
       {/* Portfolio */}
-      <section id="work" style={{ position: 'relative', zIndex: 1, padding: '0 40px 100px', maxWidth: 1100, margin: '0 auto' }}>
-        <div style={{ textAlign: 'center', marginBottom: 64 }}>
+      <section id="work" className="lp-section" style={{ position: 'relative', zIndex: 1, padding: '0 40px 100px', maxWidth: 1100, margin: '0 auto' }}>
+        <div className="lp-section-hdr" style={{ textAlign: 'center', marginBottom: 64 }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 14 }}>Our Work</div>
           <h2 style={{ fontSize: 'clamp(28px, 4vw, 42px)', fontWeight: 900, margin: 0, letterSpacing: -0.5 }}>Sites we&apos;ve built</h2>
         </div>
@@ -189,8 +192,8 @@ export default function HomePage() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" style={{ position: 'relative', zIndex: 1, padding: '0 40px 100px', maxWidth: 1100, margin: '0 auto' }}>
-        <div style={{ textAlign: 'center', marginBottom: 64 }}>
+      <section id="pricing" className="lp-section" style={{ position: 'relative', zIndex: 1, padding: '0 40px 100px', maxWidth: 1100, margin: '0 auto' }}>
+        <div className="lp-section-hdr" style={{ textAlign: 'center', marginBottom: 64 }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 14 }}>Pricing</div>
           <h2 style={{ fontSize: 'clamp(28px, 4vw, 42px)', fontWeight: 900, margin: '0 0 16px', letterSpacing: -0.5 }}>Straightforward pricing</h2>
           <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.35)', margin: 0 }}>One-time setup fee + a low monthly to keep everything running.</p>
@@ -227,8 +230,8 @@ export default function HomePage() {
       </section>
 
       {/* CTA */}
-      <section style={{ position: 'relative', zIndex: 1, padding: '0 40px 120px', maxWidth: 700, margin: '0 auto', textAlign: 'center' }}>
-        <div style={{ background: '#0F0F0F', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 24, padding: '72px 48px', position: 'relative', overflow: 'hidden' }}>
+      <section className="lp-section" style={{ position: 'relative', zIndex: 1, padding: '0 40px 120px', maxWidth: 700, margin: '0 auto', textAlign: 'center' }}>
+        <div className="lp-cta-card" style={{ background: '#0F0F0F', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 24, padding: '72px 48px', position: 'relative', overflow: 'hidden' }}>
           <div style={{ position: 'absolute', top: -80, left: '50%', transform: 'translateX(-50%)', width: 500, height: 300, background: 'radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%)', pointerEvents: 'none' }} />
           <div style={{ position: 'relative' }}>
             <h2 style={{ fontSize: 'clamp(26px, 4vw, 38px)', fontWeight: 900, marginBottom: 16, letterSpacing: -0.5, lineHeight: 1.2 }}>Ready to get your business online?</h2>
@@ -243,7 +246,7 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer style={{ position: 'relative', zIndex: 1, borderTop: '1px solid rgba(255,255,255,0.05)', padding: '28px 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+      <footer className="lp-footer" style={{ position: 'relative', zIndex: 1, borderTop: '1px solid rgba(255,255,255,0.05)', padding: '28px 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{ width: 28, height: 28, background: '#F59E0B', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 10, color: '#000' }}>MJ</div>
           <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.25)' }}>© 2026 MJ Agency. All rights reserved.</span>
@@ -251,7 +254,23 @@ export default function HomePage() {
         <a href="/login" style={{ fontSize: 13, color: 'rgba(255,255,255,0.25)', textDecoration: 'none', fontWeight: 600 }}>Client Login</a>
       </footer>
 
-      <style>{`* { -webkit-font-smoothing: antialiased; } a { transition: opacity 0.15s; } a:hover { opacity: 0.75; }`}</style>
+      <style>{`
+        * { -webkit-font-smoothing: antialiased; box-sizing: border-box; }
+        a { transition: opacity 0.15s; } a:hover { opacity: 0.75; }
+        @media (max-width: 768px) {
+          .lp-nav { padding: 0 20px !important; }
+          .lp-nav-links { display: none !important; }
+          .lp-nav-mobile-btn { display: block !important; }
+          .lp-hero { padding: 64px 20px 56px !important; }
+          .lp-stats { }
+          .lp-stats-inner { padding: 28px 20px !important; gap: 24px !important; justify-content: space-around !important; }
+          .lp-section { padding: 0 20px 60px !important; }
+          .lp-section-top { padding: 60px 20px 60px !important; }
+          .lp-cta-card { padding: 40px 24px !important; border-radius: 18px !important; }
+          .lp-footer { padding: 24px 20px !important; }
+          .lp-section-hdr { margin-bottom: 36px !important; }
+        }
+      `}</style>
     </div>
   )
 }
