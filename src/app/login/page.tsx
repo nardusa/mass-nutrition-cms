@@ -47,8 +47,8 @@ function LoginForm() {
     welcomeMsg: `Sign in to manage your ${clientData.business_name} website`,
     btnTextColor: '#fff',
   } : {
-    primary: '#ffffff',
-    accent: 'rgba(255,255,255,0.6)',
+    primary: '#F59E0B',
+    accent: '#FCD34D',
     name: 'MJ Agency',
     letter: 'MJ',
     tagline: 'Admin Portal',
@@ -74,7 +74,7 @@ function LoginForm() {
       {/* Grid */}
       <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', backgroundImage: 'linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)', backgroundSize: '72px 72px' }} />
       {/* Glow */}
-      <div style={{ position: 'fixed', top: -200, left: '50%', transform: 'translateX(-50%)', width: 600, height: 400, borderRadius: '50%', background: `radial-gradient(circle, ${isAgency ? 'rgba(255,255,255,0.04)' : brand.primary + '15'} 0%, transparent 70%)`, pointerEvents: 'none' }} />
+      <div style={{ position: 'fixed', top: -200, left: '50%', transform: 'translateX(-50%)', width: 600, height: 400, borderRadius: '50%', background: `radial-gradient(circle, ${brand.primary}12 0%, transparent 70%)`, pointerEvents: 'none' }} />
 
       <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: 420, background: '#0F0F0F', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 20, padding: '48px 40px', boxShadow: '0 24px 64px rgba(0,0,0,0.6)' }}>
 
@@ -82,17 +82,17 @@ function LoginForm() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 40 }}>
           <div style={{
             width: 48, height: 48, flexShrink: 0, borderRadius: 13,
-            background: isAgency ? '#fff' : `linear-gradient(135deg, ${brand.primary}, ${brand.primary}BB)`,
+            background: `linear-gradient(135deg, ${brand.primary}, ${brand.primary}BB)`,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: clientData ? 20 : 13, fontWeight: 900,
-            color: isAgency ? '#000' : '#fff',
-            boxShadow: isAgency ? 'none' : `0 0 24px ${brand.primary}40`,
+            color: brand.btnTextColor,
+            boxShadow: `0 0 24px ${brand.primary}40`,
           }}>
             {brand.letter}
           </div>
           <div>
             <div style={{ fontSize: 16, fontWeight: 800, letterSpacing: 0.3, color: '#fff', lineHeight: 1.2 }}>{brand.name.toUpperCase()}</div>
-            <div style={{ fontSize: 10, color: isAgency ? 'rgba(255,255,255,0.35)' : brand.primary, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginTop: 3 }}>{brand.tagline}</div>
+            <div style={{ fontSize: 10, color: brand.accent, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginTop: 3 }}>{brand.tagline}</div>
           </div>
         </div>
 
@@ -114,10 +114,10 @@ function LoginForm() {
             type="submit" disabled={loading}
             style={{
               width: '100%', border: 'none', borderRadius: 12, padding: '15px',
-              background: isAgency ? '#fff' : `linear-gradient(135deg, ${brand.primary}, ${brand.primary}CC)`,
+              background: `linear-gradient(135deg, ${brand.primary}, ${brand.primary}CC)`,
               color: brand.btnTextColor, fontSize: 14, fontWeight: 700, cursor: 'pointer',
               letterSpacing: 0.3, fontFamily: 'inherit',
-              boxShadow: isAgency ? 'none' : `0 8px 24px ${brand.primary}35`,
+              boxShadow: `0 8px 24px ${brand.primary}35`,
             }}
           >
             {loading ? 'Signing in…' : 'Sign In →'}

@@ -41,7 +41,7 @@ export default function ChangePasswordPage() {
 
   if (checking) return (
     <div style={{ minHeight: '100vh', background: '#080C14', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ width: 28, height: 28, border: '3px solid #0EA5E9', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+      <div style={{ width: 28, height: 28, border: '3px solid #F59E0B', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
     </div>
   )
@@ -52,7 +52,7 @@ export default function ChangePasswordPage() {
       <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: 420, background: '#0F0F0F', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 20, padding: '48px 40px' }}>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 36 }}>
-          <div style={{ width: 34, height: 34, background: '#fff', borderRadius: 9, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 12, color: '#000' }}>MJ</div>
+          <div style={{ width: 34, height: 34, background: '#F59E0B', borderRadius: 9, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 12, color: '#000' }}>MJ</div>
           <span style={{ fontWeight: 800, fontSize: 14 }}>MJ Agency</span>
         </div>
 
@@ -99,7 +99,7 @@ export default function ChangePasswordPage() {
           <button
             type="submit"
             disabled={saving}
-            style={{ width: '100%', border: 'none', borderRadius: 12, padding: '16px', background: '#fff', color: '#000', fontSize: 15, fontWeight: 700, cursor: 'pointer', opacity: saving ? 0.7 : 1, fontFamily: 'inherit' }}
+            style={{ width: '100%', border: 'none', borderRadius: 12, padding: '16px', background: '#F59E0B', color: '#000', fontSize: 15, fontWeight: 700, cursor: 'pointer', opacity: saving ? 0.7 : 1, fontFamily: 'inherit', boxShadow: '0 8px 24px rgba(245,158,11,0.3)' }}
           >
             {saving ? 'Saving…' : 'Set Password & Enter →'}
           </button>

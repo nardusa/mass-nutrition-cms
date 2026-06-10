@@ -57,13 +57,13 @@ export default function HomePage() {
       {/* Nav */}
       <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(8,8,8,0.85)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(255,255,255,0.06)', padding: '0 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 60 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ width: 32, height: 32, background: '#fff', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 12, letterSpacing: 0.5, color: '#000' }}>MJ</div>
+          <div style={{ width: 32, height: 32, background: '#F59E0B', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 12, letterSpacing: 0.5, color: '#000' }}>MJ</div>
           <span style={{ fontWeight: 800, fontSize: 15, letterSpacing: 0.2 }}>MJ Agency</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
           <a href="#work" style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', textDecoration: 'none', fontWeight: 600 }}>Work</a>
           <a href="#pricing" style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', textDecoration: 'none', fontWeight: 600 }}>Pricing</a>
-          <a href="/login" style={{ background: '#fff', borderRadius: 8, padding: '7px 16px', color: '#000', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>
+          <a href="/login" style={{ background: '#F59E0B', borderRadius: 8, padding: '7px 16px', color: '#000', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>
             Client Login
           </a>
         </div>
@@ -74,7 +74,7 @@ export default function HomePage() {
         <div style={{ position: 'absolute', top: -60, left: '50%', transform: 'translateX(-50%)', width: 900, height: 700, background: 'radial-gradient(ellipse, rgba(255,255,255,0.03) 0%, transparent 65%)', pointerEvents: 'none' }} />
 
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 100, padding: '6px 16px', fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.7)', letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 36 }}>
-          <span style={{ width: 6, height: 6, background: '#fff', borderRadius: '50%', display: 'inline-block' }} />
+          <span style={{ width: 6, height: 6, background: '#F59E0B', borderRadius: '50%', display: 'inline-block' }} />
           Web Design & Development
         </div>
 
@@ -88,7 +88,7 @@ export default function HomePage() {
         </p>
 
         <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
-          <a href="mailto:contact@mjagency.com?subject=Website Quote Request" style={{ background: '#fff', borderRadius: 10, padding: '14px 30px', color: '#000', fontSize: 15, fontWeight: 700, textDecoration: 'none', letterSpacing: 0.2 }}>
+          <a href="mailto:contact@mjagency.com?subject=Website Quote Request" style={{ background: '#F59E0B', borderRadius: 10, padding: '14px 30px', color: '#000', fontSize: 15, fontWeight: 700, textDecoration: 'none', letterSpacing: 0.2 }}>
             Get a Free Quote
           </a>
           <a href="#work" style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 10, padding: '14px 30px', color: 'rgba(255,255,255,0.7)', fontSize: 15, fontWeight: 700, textDecoration: 'none', letterSpacing: 0.2 }}>
@@ -126,7 +126,7 @@ export default function HomePage() {
             { step: '02', title: 'We build it', desc: 'Your site goes live within 7 days. Fast, mobile-friendly, and built to your exact brand.' },
             { step: '03', title: 'You take the wheel', desc: 'Log into your own dashboard and update text, products, images, and colors — no coding required.' },
           ].map((item, i) => (
-            <div key={item.step} style={{ padding: '40px 36px', background: i === 1 ? 'rgba(255,255,255,0.04)' : 'transparent', border: `1px solid ${i === 1 ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.05)'}`, borderRadius: 16 }}>
+            <div key={item.step} style={{ padding: '40px 36px', background: i === 1 ? 'rgba(245,158,11,0.06)' : 'transparent', border: `1px solid ${i === 1 ? 'rgba(245,158,11,0.25)' : 'rgba(255,255,255,0.05)'}`, borderRadius: 16 }}>
               <div style={{ fontSize: 11, fontWeight: 800, color: 'rgba(255,255,255,0.25)', letterSpacing: 2, marginBottom: 20 }}>STEP {item.step}</div>
               <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 14, lineHeight: 1.3 }}>{item.title}</div>
               <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.4)', lineHeight: 1.8 }}>{item.desc}</div>
@@ -197,7 +197,7 @@ export default function HomePage() {
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16, alignItems: 'start' }}>
           {PLANS.map(plan => (
-            <div key={plan.name} style={{ background: plan.highlight ? '#fff' : '#0F0F0F', border: `1px solid ${plan.highlight ? 'transparent' : 'rgba(255,255,255,0.06)'}`, borderRadius: 18, padding: '36px 32px', position: 'relative', color: plan.highlight ? '#000' : '#fff' }}>
+            <div key={plan.name} style={{ background: plan.highlight ? '#F59E0B' : '#0F0F0F', border: `1px solid ${plan.highlight ? 'transparent' : 'rgba(255,255,255,0.06)'}`, borderRadius: 18, padding: '36px 32px', position: 'relative', color: plan.highlight ? '#000' : '#fff' }}>
               {plan.highlight && (
                 <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: '#000', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 100, padding: '4px 14px', fontSize: 11, fontWeight: 800, color: '#fff', letterSpacing: 1, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
                   Most Popular
@@ -218,7 +218,7 @@ export default function HomePage() {
                   </div>
                 ))}
               </div>
-              <a href="mailto:contact@mjagency.com?subject=Quote Request - MJ Agency" style={{ display: 'block', textAlign: 'center', background: plan.highlight ? '#000' : '#fff', border: 'none', borderRadius: 10, padding: '13px', color: plan.highlight ? '#fff' : '#000', fontSize: 14, fontWeight: 700, textDecoration: 'none', letterSpacing: 0.2 }}>
+              <a href="mailto:contact@mjagency.com?subject=Quote Request - MJ Agency" style={{ display: 'block', textAlign: 'center', background: plan.highlight ? '#000' : '#F59E0B', border: 'none', borderRadius: 10, padding: '13px', color: '#000', fontSize: 14, fontWeight: 700, textDecoration: 'none', letterSpacing: 0.2 }}>
                 {plan.name === 'Custom' ? 'Get in Touch' : 'Get Started'}
               </a>
             </div>
@@ -235,7 +235,7 @@ export default function HomePage() {
             <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.4)', marginBottom: 40, lineHeight: 1.7, maxWidth: 440, margin: '0 auto 40px' }}>
               Send us a message and we&apos;ll reply within 24 hours. No sales pitch — just a real conversation about what you need.
             </p>
-            <a href="mailto:contact@mjagency.com?subject=Website Quote Request" style={{ display: 'inline-block', background: '#fff', borderRadius: 10, padding: '16px 40px', color: '#000', fontSize: 15, fontWeight: 700, textDecoration: 'none', letterSpacing: 0.2 }}>
+            <a href="mailto:contact@mjagency.com?subject=Website Quote Request" style={{ display: 'inline-block', background: '#F59E0B', borderRadius: 10, padding: '16px 40px', color: '#000', fontSize: 15, fontWeight: 700, textDecoration: 'none', letterSpacing: 0.2 }}>
               Start the Conversation
             </a>
           </div>
@@ -245,7 +245,7 @@ export default function HomePage() {
       {/* Footer */}
       <footer style={{ position: 'relative', zIndex: 1, borderTop: '1px solid rgba(255,255,255,0.05)', padding: '28px 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ width: 28, height: 28, background: '#fff', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 10, color: '#000' }}>MJ</div>
+          <div style={{ width: 28, height: 28, background: '#F59E0B', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 10, color: '#000' }}>MJ</div>
           <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.25)' }}>© 2026 MJ Agency. All rights reserved.</span>
         </div>
         <a href="/login" style={{ fontSize: 13, color: 'rgba(255,255,255,0.25)', textDecoration: 'none', fontWeight: 600 }}>Client Login</a>
