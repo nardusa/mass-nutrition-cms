@@ -75,13 +75,13 @@ function IntakeForm() {
     setSubmitted(true)
   }
 
-  const brandBlue = '#0EA5E9'
+  const brandBlue = '#ffffff'
 
   const btnPrimary: React.CSSProperties = {
-    background: `linear-gradient(135deg, ${brandBlue}, #0284C7)`,
+    background: '#fff',
     border: 'none', borderRadius: 12, padding: '15px 36px',
-    color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer',
-    boxShadow: `0 6px 20px rgba(14,165,233,0.35)`, width: '100%',
+    color: '#000', fontSize: 15, fontWeight: 700, cursor: 'pointer',
+    width: '100%',
   }
   const btnSecondary: React.CSSProperties = {
     background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
@@ -96,7 +96,7 @@ function IntakeForm() {
   }
 
   if (loading) return (
-    <div style={{ minHeight: '100vh', background: '#050A12', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <div style={{ minHeight: '100vh', background: '#080808', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={gridBg} />
       <div style={{ width: 32, height: 32, border: `3px solid ${brandBlue}`, borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite', position: 'relative', zIndex: 1 }} />
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
@@ -104,7 +104,7 @@ function IntakeForm() {
   )
 
   if (notFound) return (
-    <div style={{ minHeight: '100vh', background: '#050A12', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', textAlign: 'center', padding: 24, position: 'relative' }}>
+    <div style={{ minHeight: '100vh', background: '#080808', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', textAlign: 'center', padding: 24, position: 'relative' }}>
       <div style={gridBg} />
       <div style={{ position: 'relative', zIndex: 1 }}>
         <div style={{ width: 64, height: 64, background: 'rgba(14,165,233,0.08)', border: '1px solid rgba(14,165,233,0.2)', borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, margin: '0 auto 20px' }}>↗</div>
@@ -115,7 +115,7 @@ function IntakeForm() {
   )
 
   if (submitted) return (
-    <div style={{ minHeight: '100vh', background: '#050A12', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', textAlign: 'center', padding: 24, position: 'relative' }}>
+    <div style={{ minHeight: '100vh', background: '#080808', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', textAlign: 'center', padding: 24, position: 'relative' }}>
       <div style={gridBg} />
       <div style={{ position: 'relative', zIndex: 1, maxWidth: 480 }}>
         <div style={{ width: 80, height: 80, background: 'rgba(14,165,233,0.1)', border: '2px solid rgba(14,165,233,0.4)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, margin: '0 auto 28px', boxShadow: '0 0 40px rgba(14,165,233,0.15)' }}>✓</div>
@@ -124,7 +124,7 @@ function IntakeForm() {
           We received everything we need to get started on your website.<br />
           We&apos;ll reach out within <strong style={{ color: '#fff' }}>2 business days</strong> with your first draft.
         </div>
-        <div style={{ padding: '20px 24px', background: '#0A1020', border: '1px solid rgba(14,165,233,0.12)', borderRadius: 14, fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>
+        <div style={{ padding: '20px 24px', background: '#0F0F0F', border: '1px solid rgba(14,165,233,0.12)', borderRadius: 14, fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>
           Questions? Email us at <span style={{ color: brandBlue }}>contact@mjagency.com</span>
         </div>
       </div>
@@ -132,7 +132,7 @@ function IntakeForm() {
   )
 
   return (
-    <div style={{ minHeight: '100vh', background: '#050A12', color: '#fff', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '40px 20px', position: 'relative' }}>
+    <div style={{ minHeight: '100vh', background: '#080808', color: '#fff', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '40px 20px', position: 'relative' }}>
       <div style={gridBg} />
 
       {/* Header */}
@@ -147,12 +147,12 @@ function IntakeForm() {
           <div style={{ fontSize: 12, color: brandBlue, fontWeight: 700 }}>{Math.round((step / TOTAL_STEPS) * 100)}%</div>
         </div>
         <div style={{ height: 3, background: 'rgba(255,255,255,0.06)', borderRadius: 2, overflow: 'hidden' }}>
-          <div style={{ height: '100%', width: `${(step / TOTAL_STEPS) * 100}%`, background: `linear-gradient(90deg, ${brandBlue}, #38BDF8)`, borderRadius: 2, transition: 'width 0.4s ease', boxShadow: `0 0 12px ${brandBlue}60` }} />
+          <div style={{ height: '100%', width: `${(step / TOTAL_STEPS) * 100}%`, background: '#fff', borderRadius: 2, transition: 'width 0.4s ease' }} />
         </div>
       </div>
 
       {/* Card */}
-      <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: 560, background: '#0A1020', border: '1px solid rgba(14,165,233,0.12)', borderRadius: 20, padding: '40px 36px' }}>
+      <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: 560, background: '#0F0F0F', border: '1px solid rgba(14,165,233,0.12)', borderRadius: 20, padding: '40px 36px' }}>
 
         {/* Step 1 — Welcome */}
         {step === 1 && (
@@ -316,7 +316,7 @@ function IntakeForm() {
 export default function IntakePage() {
   return (
     <Suspense fallback={
-      <div style={{ minHeight: '100vh', background: '#050A12', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ minHeight: '100vh', background: '#080808', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ width: 32, height: 32, border: '3px solid #0EA5E9', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
         <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
       </div>

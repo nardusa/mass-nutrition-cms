@@ -47,12 +47,12 @@ export default function ChangePasswordPage() {
   )
 
   return (
-    <div style={{ minHeight: '100vh', background: '#050A12', color: '#fff', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, position: 'relative', overflow: 'hidden' }}>
-      <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', backgroundImage: 'linear-gradient(rgba(14,165,233,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(14,165,233,0.025) 1px, transparent 1px)', backgroundSize: '72px 72px' }} />
-      <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: 420, background: '#0A1020', border: '1px solid rgba(14,165,233,0.15)', borderRadius: 20, padding: '48px 40px' }}>
+    <div style={{ minHeight: '100vh', background: '#080808', color: '#fff', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, position: 'relative', overflow: 'hidden' }}>
+      <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', backgroundImage: 'linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)', backgroundSize: '72px 72px' }} />
+      <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: 420, background: '#0F0F0F', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 20, padding: '48px 40px' }}>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 36 }}>
-          <div style={{ width: 34, height: 34, background: 'linear-gradient(135deg,#0EA5E9,#0284C7)', borderRadius: 9, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 12, boxShadow: '0 0 16px rgba(14,165,233,0.35)' }}>MJ</div>
+          <div style={{ width: 34, height: 34, background: '#fff', borderRadius: 9, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 12, color: '#000' }}>MJ</div>
           <span style={{ fontWeight: 800, fontSize: 14 }}>MJ Agency</span>
         </div>
 
@@ -76,7 +76,7 @@ export default function ChangePasswordPage() {
             value={password}
             onChange={e => setPassword(e.target.value)}
             required
-            style={{ width: '100%', boxSizing: 'border-box', background: '#0F1929', border: '1.5px solid rgba(14,165,233,0.15)', borderRadius: 12, padding: '14px 16px', color: '#fff', fontSize: 15, marginBottom: 16, outline: 'none', fontFamily: 'inherit' }}
+            style={{ width: '100%', boxSizing: 'border-box', background: '#0A0A0A', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, padding: '14px 16px', color: '#fff', fontSize: 15, marginBottom: 16, outline: 'none', fontFamily: 'inherit' }}
           />
           <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 8 }}>Confirm Password</label>
           <input
@@ -85,7 +85,7 @@ export default function ChangePasswordPage() {
             value={confirm}
             onChange={e => setConfirm(e.target.value)}
             required
-            style={{ width: '100%', boxSizing: 'border-box', background: '#0F1929', border: '1.5px solid rgba(14,165,233,0.15)', borderRadius: 12, padding: '14px 16px', color: '#fff', fontSize: 15, marginBottom: 28, outline: 'none', fontFamily: 'inherit' }}
+            style={{ width: '100%', boxSizing: 'border-box', background: '#0A0A0A', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, padding: '14px 16px', color: '#fff', fontSize: 15, marginBottom: 28, outline: 'none', fontFamily: 'inherit' }}
           />
 
           {password.length > 0 && (
@@ -99,7 +99,7 @@ export default function ChangePasswordPage() {
           <button
             type="submit"
             disabled={saving}
-            style={{ width: '100%', border: 'none', borderRadius: 12, padding: '16px', background: 'linear-gradient(135deg,#0EA5E9,#0284C7)', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', boxShadow: '0 8px 24px rgba(14,165,233,0.35)', opacity: saving ? 0.7 : 1 }}
+            style={{ width: '100%', border: 'none', borderRadius: 12, padding: '16px', background: '#fff', color: '#000', fontSize: 15, fontWeight: 700, cursor: 'pointer', opacity: saving ? 0.7 : 1, fontFamily: 'inherit' }}
           >
             {saving ? 'Saving…' : 'Set Password & Enter →'}
           </button>

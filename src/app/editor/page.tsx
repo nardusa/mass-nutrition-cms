@@ -149,20 +149,20 @@ function EditorInner() {
     showToast('Product deleted')
   }
 
-  const brandColor  = isAdmin ? '#0EA5E9' : (content.primary_color  || client?.portal_color  || '#0EA5E9')
-  const brandColor2 = isAdmin ? '#0284C7' : (content.accent_color   || client?.portal_accent || brandColor)
+  const brandColor  = isAdmin ? '#ffffff' : (content.primary_color  || client?.portal_color  || '#ffffff')
+  const brandColor2 = isAdmin ? 'rgba(255,255,255,0.7)' : (content.accent_color   || client?.portal_accent || brandColor)
   const brandLetter = isAdmin ? 'MJ'      : (client?.logo_letter    || client?.business_name?.[0]?.toUpperCase() || 'C')
   const brandName   = isAdmin ? 'MJ Agency' : (client?.business_name || 'Your Brand')
 
   if (loading) return (
-    <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#050A12' }}>
+    <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#080808' }}>
       <div style={{ width: 28, height: 28, border: `2px solid ${brandColor}`, borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
     </div>
   )
 
   return (
-    <div style={{ display: 'flex', height: '100vh', background: '#050A12', overflow: 'hidden', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' }}>
+    <div style={{ display: 'flex', height: '100vh', background: '#080808', overflow: 'hidden', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' }}>
 
       {/* ── Sidebar ── */}
       <div style={{ width: 256, background: '#070E1B', borderRight: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
@@ -170,7 +170,7 @@ function EditorInner() {
         {/* Brand header */}
         <div style={{ padding: '24px 20px 20px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: client && isAdmin ? 16 : 0 }}>
-            <div style={{ width: 38, height: 38, background: `linear-gradient(135deg,${brandColor},${brandColor2})`, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: brandLetter.length > 1 ? 12 : 16, boxShadow: `0 0 20px ${brandColor}35`, flexShrink: 0 }}>
+            <div style={{ width: 38, height: 38, background: isAdmin ? '#fff' : `linear-gradient(135deg,${brandColor},${brandColor2})`, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: brandLetter.length > 1 ? 12 : 16, boxShadow: isAdmin ? 'none' : `0 0 20px ${brandColor}35`, flexShrink: 0, color: isAdmin ? '#000' : '#fff' }}>
               {brandLetter}
             </div>
             <div style={{ overflow: 'hidden' }}>
@@ -258,10 +258,10 @@ function EditorInner() {
             onClick={saveContent}
             disabled={saving}
             style={{
-              background: saved ? 'rgba(34,197,94,0.12)' : `linear-gradient(135deg,${brandColor},${brandColor2})`,
-              border: saved ? '1px solid rgba(34,197,94,0.3)' : 'none',
+              background: saved ? 'rgba(255,255,255,0.08)' : (isAdmin ? '#fff' : `linear-gradient(135deg,${brandColor},${brandColor2})`),
+              border: saved ? '1px solid rgba(255,255,255,0.15)' : 'none',
               borderRadius: 10, padding: '10px 24px',
-              color: saved ? '#4ade80' : '#fff',
+              color: saved ? 'rgba(255,255,255,0.7)' : (isAdmin ? '#000' : '#fff'),
               fontSize: 13, fontWeight: 700, cursor: 'pointer',
               boxShadow: saved ? 'none' : `0 4px 16px ${brandColor}35`,
               transition: 'all 0.2s', fontFamily: 'inherit', minWidth: 120,
@@ -541,7 +541,7 @@ function EditorInner() {
 
 export default function EditorPage() {
   return (
-    <Suspense fallback={<div style={{ height: '100vh', background: '#050A12', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><div style={{ width: 28, height: 28, border: '2px solid #0EA5E9', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} /><style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style></div>}>
+    <Suspense fallback={<div style={{ height: '100vh', background: '#080808', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><div style={{ width: 28, height: 28, border: '2px solid #0EA5E9', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} /><style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style></div>}>
       <EditorInner />
     </Suspense>
   )
