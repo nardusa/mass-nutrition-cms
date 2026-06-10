@@ -430,17 +430,19 @@ function EditorInner() {
             {/* ── SOCIAL ── */}
             {tab === 'Social' && (
               <>
-                <SectionCard title="Live Site" desc="The public URL where this site is hosted">
-                  <Field label="Live Site URL" hint="Saved separately from other content">
-                    <input
-                      style={inp({ marginBottom: 0 })}
-                      type="url"
-                      value={siteUrl}
-                      onChange={e => setSiteUrl(e.target.value)}
-                      placeholder="https://yourclientsite.com"
-                    />
-                  </Field>
-                </SectionCard>
+                {isAdmin && (
+                  <SectionCard title="Live Site" desc="The public URL where this site is hosted">
+                    <Field label="Live Site URL" hint="Saved separately from other content">
+                      <input
+                        style={inp({ marginBottom: 0 })}
+                        type="url"
+                        value={siteUrl}
+                        onChange={e => setSiteUrl(e.target.value)}
+                        placeholder="https://yourclientsite.com"
+                      />
+                    </Field>
+                  </SectionCard>
+                )}
 
                 <SectionCard title="Contact" desc="How customers reach you">
                   <Field label="Email">
