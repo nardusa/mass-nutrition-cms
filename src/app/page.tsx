@@ -1,6 +1,6 @@
-'use client'
-import { useState, useEffect } from 'react'
-import { supabase, type AgencyContent } from '@/lib/supabase'
+import { createServerSupabaseClient, type AgencyContent } from '@/lib/supabase'
+
+export const dynamic = 'force-dynamic'
 
 type PortfolioClient = {
   business_name: string
@@ -36,23 +36,20 @@ const PLANS_DEFAULT = [
   },
 ]
 
-export default function HomePage() {
-  const [clients, setClients] = useState<PortfolioClient[]>([])
-  const [ac, setAc] = useState<AgencyContent | null>(null)
+export default async function HomePage() {
+  const db = createServerSupabaseClient()
 
-  useEffect(() => {
-    supabase
-      .from('clients')
+  const [{ data: clientsData }, { data: acData }] = await Promise.all([
+    db.from('clients')
       .select('business_name, site_url, logo_letter, portal_color')
       .eq('status', 'active')
-      .not('site_url', 'is', null)
-      .then(({ data }) => setClients(data || []))
+      .not('site_url', 'is', null),
+    db.from('agency_content').select('*').single(),
+  ])
 
-    supabase.from('agency_content').select('*').single()
-      .then(({ data }) => { if (data) setAc(data) })
-  }, [])
+  const clients: PortfolioClient[] = clientsData || []
+  const ac: AgencyContent | null = acData
 
-  // Dynamic values — fall back to hardcoded defaults if table not yet set up
   const primary       = ac?.primary_color      ?? '#F59E0B'
   const company       = ac?.company_name        ?? 'MJ Agency'
   const letters       = ac?.logo_letters        ?? 'MJ'
