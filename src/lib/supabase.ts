@@ -53,6 +53,39 @@ export type SiteContent = {
   updated_at: string
 }
 
+export type AgencyContent = {
+  id: string
+  company_name: string
+  logo_letters: string
+  primary_color: string
+  accent_color: string
+  contact_email: string
+  hero_badge: string
+  hero_headline_1: string
+  hero_headline_2: string
+  hero_subtitle: string
+  hero_cta_primary: string
+  hero_cta_secondary: string
+  stat_1_val: string
+  stat_1_label: string
+  stat_2_val: string
+  stat_2_label: string
+  stat_3_val: string
+  stat_3_label: string
+  stat_4_val: string
+  stat_4_label: string
+  process_title: string
+  services_title: string
+  pricing_title: string
+  pricing_subtitle: string
+  cta_title: string
+  cta_subtitle: string
+  cta_button: string
+  footer_copyright: string
+  pricing_plans: Array<{ name: string; price: string; monthly: string | null; desc: string; features: string[]; highlight: boolean }>
+  updated_at: string
+}
+
 export type Product = {
   id: string
   client_id: string

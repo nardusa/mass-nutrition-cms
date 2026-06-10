@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
+import { supabase, type AgencyContent } from '@/lib/supabase'
 
 type PortfolioClient = {
   business_name: string
@@ -9,7 +9,7 @@ type PortfolioClient = {
   portal_color: string | null
 }
 
-const PLANS = [
+const PLANS_DEFAULT = [
   {
     name: 'Starter',
     price: '$499',
@@ -28,7 +28,7 @@ const PLANS = [
   },
   {
     name: 'Custom',
-    price: 'Let\'s talk',
+    price: "Let's talk",
     monthly: null,
     desc: 'For businesses with specific needs or multiple locations.',
     features: ['Everything in Pro', 'Custom features & integrations', 'E-commerce ready', 'Multiple team logins', 'Ongoing retainer available'],
@@ -38,6 +38,7 @@ const PLANS = [
 
 export default function HomePage() {
   const [clients, setClients] = useState<PortfolioClient[]>([])
+  const [ac, setAc] = useState<AgencyContent | null>(null)
 
   useEffect(() => {
     supabase
@@ -46,7 +47,37 @@ export default function HomePage() {
       .eq('status', 'active')
       .not('site_url', 'is', null)
       .then(({ data }) => setClients(data || []))
+
+    supabase.from('agency_content').select('*').single()
+      .then(({ data }) => { if (data) setAc(data) })
   }, [])
+
+  // Dynamic values — fall back to hardcoded defaults if table not yet set up
+  const primary       = ac?.primary_color      ?? '#F59E0B'
+  const company       = ac?.company_name        ?? 'MJ Agency'
+  const letters       = ac?.logo_letters        ?? 'MJ'
+  const email         = ac?.contact_email       ?? 'contact@mjagency.com'
+  const badge         = ac?.hero_badge          ?? 'Web Design & Development'
+  const headline1     = ac?.hero_headline_1     ?? 'Your business deserves'
+  const headline2     = ac?.hero_headline_2     ?? 'a website that works.'
+  const subtitle      = ac?.hero_subtitle       ?? 'We build fast, modern websites for local businesses — and hand you a dashboard so you can update it yourself, any time.'
+  const ctaPrimary    = ac?.hero_cta_primary    ?? 'Get a Free Quote'
+  const ctaSecondary  = ac?.hero_cta_secondary  ?? 'See Our Work'
+  const processTitle  = ac?.process_title       ?? 'Simple from start to finish'
+  const servicesTitle = ac?.services_title      ?? 'Everything your business needs online'
+  const pricingTitle  = ac?.pricing_title       ?? 'Straightforward pricing'
+  const pricingSubtitle = ac?.pricing_subtitle  ?? 'One-time setup fee + a low monthly to keep everything running.'
+  const ctaTitle      = ac?.cta_title           ?? 'Ready to get your business online?'
+  const ctaSubtitle   = ac?.cta_subtitle        ?? "Send us a message and we'll reply within 24 hours. No sales pitch — just a real conversation about what you need."
+  const ctaButton     = ac?.cta_button          ?? 'Start the Conversation'
+  const copyright     = ac?.footer_copyright    ?? '© 2026 MJ Agency. All rights reserved.'
+  const stats         = [
+    { val: ac?.stat_1_val ?? '7-Day',    label: ac?.stat_1_label ?? 'Average delivery' },
+    { val: ac?.stat_2_val ?? '100%',     label: ac?.stat_2_label ?? 'Mobile optimized' },
+    { val: ac?.stat_3_val ?? 'You Own',  label: ac?.stat_3_label ?? 'Your dashboard & code' },
+    { val: ac?.stat_4_val ?? '24hr',     label: ac?.stat_4_label ?? 'Response time' },
+  ]
+  const plans = ac?.pricing_plans ?? PLANS_DEFAULT
 
   return (
     <div style={{ background: '#080808', color: '#fff', minHeight: '100vh', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', overflowX: 'hidden' }}>
@@ -57,17 +88,17 @@ export default function HomePage() {
       {/* Nav */}
       <nav className="lp-nav" style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(8,8,8,0.85)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(255,255,255,0.06)', padding: '0 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 60 }}>
         <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', color: 'inherit' }}>
-          <div style={{ width: 32, height: 32, background: '#F59E0B', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 12, letterSpacing: 0.5, color: '#000' }}>MJ</div>
-          <span style={{ fontWeight: 800, fontSize: 15, letterSpacing: 0.2 }}>MJ Agency</span>
+          <div style={{ width: 32, height: 32, background: primary, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 12, letterSpacing: 0.5, color: '#000' }}>{letters}</div>
+          <span style={{ fontWeight: 800, fontSize: 15, letterSpacing: 0.2 }}>{company}</span>
         </a>
         <div className="lp-nav-links" style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
           <a href="#work" style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', textDecoration: 'none', fontWeight: 600 }}>Work</a>
           <a href="#pricing" style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', textDecoration: 'none', fontWeight: 600 }}>Pricing</a>
-          <a href="/login" style={{ background: '#F59E0B', borderRadius: 8, padding: '7px 16px', color: '#000', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>
+          <a href="/login" style={{ background: primary, borderRadius: 8, padding: '7px 16px', color: '#000', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>
             Client Login
           </a>
         </div>
-        <a className="lp-nav-mobile-btn" href="/login" style={{ display: 'none', background: '#F59E0B', borderRadius: 8, padding: '7px 14px', color: '#000', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>
+        <a className="lp-nav-mobile-btn" href="/login" style={{ display: 'none', background: primary, borderRadius: 8, padding: '7px 14px', color: '#000', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>
           Login
         </a>
       </nav>
@@ -77,25 +108,25 @@ export default function HomePage() {
         <div style={{ position: 'absolute', top: -60, left: '50%', transform: 'translateX(-50%)', width: 900, height: 700, background: 'radial-gradient(ellipse, rgba(255,255,255,0.03) 0%, transparent 65%)', pointerEvents: 'none' }} />
 
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 100, padding: '6px 16px', fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.7)', letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 36 }}>
-          <span style={{ width: 6, height: 6, background: '#F59E0B', borderRadius: '50%', display: 'inline-block' }} />
-          Web Design & Development
+          <span style={{ width: 6, height: 6, background: primary, borderRadius: '50%', display: 'inline-block' }} />
+          {badge}
         </div>
 
         <h1 style={{ fontSize: 'clamp(38px, 6.5vw, 74px)', fontWeight: 900, lineHeight: 1.08, letterSpacing: -2, margin: '0 0 28px', color: '#fff' }}>
-          Your business deserves<br />
-          <span style={{ color: 'rgba(255,255,255,0.5)' }}>a website that works.</span>
+          {headline1}<br />
+          <span style={{ color: 'rgba(255,255,255,0.5)' }}>{headline2}</span>
         </h1>
 
         <p style={{ fontSize: 18, color: 'rgba(255,255,255,0.4)', maxWidth: 560, margin: '0 auto 48px', lineHeight: 1.75, fontWeight: 400 }}>
-          We build fast, modern websites for local businesses — and hand you a dashboard so you can update it yourself, any time.
+          {subtitle}
         </p>
 
         <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
-          <a href="mailto:contact@mjagency.com?subject=Website Quote Request" style={{ background: '#F59E0B', borderRadius: 10, padding: '14px 30px', color: '#000', fontSize: 15, fontWeight: 700, textDecoration: 'none', letterSpacing: 0.2 }}>
-            Get a Free Quote
+          <a href={`mailto:${email}?subject=Website Quote Request`} style={{ background: primary, borderRadius: 10, padding: '14px 30px', color: '#000', fontSize: 15, fontWeight: 700, textDecoration: 'none', letterSpacing: 0.2 }}>
+            {ctaPrimary}
           </a>
           <a href="#work" style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 10, padding: '14px 30px', color: 'rgba(255,255,255,0.7)', fontSize: 15, fontWeight: 700, textDecoration: 'none', letterSpacing: 0.2 }}>
-            See Our Work
+            {ctaSecondary}
           </a>
         </div>
       </section>
@@ -103,12 +134,7 @@ export default function HomePage() {
       {/* Stats bar */}
       <div className="lp-stats" style={{ position: 'relative', zIndex: 1, borderTop: '1px solid rgba(255,255,255,0.05)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
         <div className="lp-stats-inner" style={{ maxWidth: 900, margin: '0 auto', padding: '40px', display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', gap: 32 }}>
-          {[
-            { val: '7-Day', label: 'Average delivery' },
-            { val: '100%', label: 'Mobile optimized' },
-            { val: 'You Own', label: 'Your dashboard & code' },
-            { val: '24hr', label: 'Response time' },
-          ].map(s => (
+          {stats.map(s => (
             <div key={s.label} style={{ textAlign: 'center' }}>
               <div style={{ fontSize: 26, fontWeight: 900, color: '#fff', letterSpacing: -0.5 }}>{s.val}</div>
               <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', fontWeight: 600, marginTop: 4, textTransform: 'uppercase', letterSpacing: 1 }}>{s.label}</div>
@@ -121,7 +147,7 @@ export default function HomePage() {
       <section className="lp-section-top" style={{ position: 'relative', zIndex: 1, padding: '100px 40px', maxWidth: 1100, margin: '0 auto' }}>
         <div className="lp-section-hdr" style={{ textAlign: 'center', marginBottom: 64 }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 14 }}>The Process</div>
-          <h2 style={{ fontSize: 'clamp(28px, 4vw, 42px)', fontWeight: 900, margin: 0, letterSpacing: -0.5 }}>Simple from start to finish</h2>
+          <h2 style={{ fontSize: 'clamp(28px, 4vw, 42px)', fontWeight: 900, margin: 0, letterSpacing: -0.5 }}>{processTitle}</h2>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 2 }}>
           {[
@@ -129,7 +155,7 @@ export default function HomePage() {
             { step: '02', title: 'We build it', desc: 'Your site goes live within 7 days. Fast, mobile-friendly, and built to your exact brand.' },
             { step: '03', title: 'You take the wheel', desc: 'Log into your own dashboard and update text, products, images, and colors — no coding required.' },
           ].map((item, i) => (
-            <div key={item.step} style={{ padding: '40px 36px', background: i === 1 ? 'rgba(245,158,11,0.06)' : 'transparent', border: `1px solid ${i === 1 ? 'rgba(245,158,11,0.25)' : 'rgba(255,255,255,0.05)'}`, borderRadius: 16 }}>
+            <div key={item.step} style={{ padding: '40px 36px', background: i === 1 ? `${primary}0F` : 'transparent', border: `1px solid ${i === 1 ? `${primary}40` : 'rgba(255,255,255,0.05)'}`, borderRadius: 16 }}>
               <div style={{ fontSize: 11, fontWeight: 800, color: 'rgba(255,255,255,0.25)', letterSpacing: 2, marginBottom: 20 }}>STEP {item.step}</div>
               <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 14, lineHeight: 1.3 }}>{item.title}</div>
               <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.4)', lineHeight: 1.8 }}>{item.desc}</div>
@@ -142,13 +168,13 @@ export default function HomePage() {
       <section className="lp-section" style={{ position: 'relative', zIndex: 1, padding: '0 40px 100px', maxWidth: 1100, margin: '0 auto' }}>
         <div className="lp-section-hdr" style={{ textAlign: 'center', marginBottom: 64 }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 14 }}>What We Build</div>
-          <h2 style={{ fontSize: 'clamp(28px, 4vw, 42px)', fontWeight: 900, margin: 0, letterSpacing: -0.5 }}>Everything your business needs online</h2>
+          <h2 style={{ fontSize: 'clamp(28px, 4vw, 42px)', fontWeight: 900, margin: 0, letterSpacing: -0.5 }}>{servicesTitle}</h2>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
           {[
             { title: 'Custom Website', desc: 'A fast, professional site built around your brand — not a cookie-cutter template. Every detail is yours.', tag: 'Design & Dev' },
-            { title: 'Content Dashboard', desc: 'Log in and update your own site. Change prices, swap photos, update hours. You\'re always in control.', tag: 'Your CMS' },
-            { title: 'Ongoing Support', desc: 'We\'re reachable by message, not a support ticket system. Real help from the people who built your site.', tag: 'Support' },
+            { title: 'Content Dashboard', desc: "Log in and update your own site. Change prices, swap photos, update hours. You're always in control.", tag: 'Your CMS' },
+            { title: 'Ongoing Support', desc: "We're reachable by message, not a support ticket system. Real help from the people who built your site.", tag: 'Support' },
           ].map(s => (
             <div key={s.title} style={{ background: '#0F0F0F', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 16, padding: '36px 32px' }}>
               <div style={{ display: 'inline-block', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 6, padding: '4px 10px', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 20 }}>{s.tag}</div>
@@ -195,12 +221,12 @@ export default function HomePage() {
       <section id="pricing" className="lp-section" style={{ position: 'relative', zIndex: 1, padding: '0 40px 100px', maxWidth: 1100, margin: '0 auto' }}>
         <div className="lp-section-hdr" style={{ textAlign: 'center', marginBottom: 64 }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 14 }}>Pricing</div>
-          <h2 style={{ fontSize: 'clamp(28px, 4vw, 42px)', fontWeight: 900, margin: '0 0 16px', letterSpacing: -0.5 }}>Straightforward pricing</h2>
-          <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.35)', margin: 0 }}>One-time setup fee + a low monthly to keep everything running.</p>
+          <h2 style={{ fontSize: 'clamp(28px, 4vw, 42px)', fontWeight: 900, margin: '0 0 16px', letterSpacing: -0.5 }}>{pricingTitle}</h2>
+          <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.35)', margin: 0 }}>{pricingSubtitle}</p>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16, alignItems: 'start' }}>
-          {PLANS.map(plan => (
-            <div key={plan.name} style={{ background: plan.highlight ? '#F59E0B' : '#0F0F0F', border: `1px solid ${plan.highlight ? 'transparent' : 'rgba(255,255,255,0.06)'}`, borderRadius: 18, padding: '36px 32px', position: 'relative', color: plan.highlight ? '#000' : '#fff' }}>
+          {plans.map(plan => (
+            <div key={plan.name} style={{ background: plan.highlight ? primary : '#0F0F0F', border: `1px solid ${plan.highlight ? 'transparent' : 'rgba(255,255,255,0.06)'}`, borderRadius: 18, padding: '36px 32px', position: 'relative', color: plan.highlight ? '#000' : '#fff' }}>
               {plan.highlight && (
                 <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: '#000', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 100, padding: '4px 14px', fontSize: 11, fontWeight: 800, color: '#fff', letterSpacing: 1, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
                   Most Popular
@@ -221,7 +247,7 @@ export default function HomePage() {
                   </div>
                 ))}
               </div>
-              <a href="mailto:contact@mjagency.com?subject=Quote Request - MJ Agency" style={{ display: 'block', textAlign: 'center', background: plan.highlight ? '#000' : '#F59E0B', border: 'none', borderRadius: 10, padding: '13px', color: '#000', fontSize: 14, fontWeight: 700, textDecoration: 'none', letterSpacing: 0.2 }}>
+              <a href={`mailto:${email}?subject=Quote Request - ${plan.name} Plan`} style={{ display: 'block', textAlign: 'center', background: plan.highlight ? '#000' : primary, border: 'none', borderRadius: 10, padding: '13px', color: plan.highlight ? '#fff' : '#000', fontSize: 14, fontWeight: 700, textDecoration: 'none', letterSpacing: 0.2 }}>
                 {plan.name === 'Custom' ? 'Get in Touch' : 'Get Started'}
               </a>
             </div>
@@ -234,12 +260,12 @@ export default function HomePage() {
         <div className="lp-cta-card" style={{ background: '#0F0F0F', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 24, padding: '72px 48px', position: 'relative', overflow: 'hidden' }}>
           <div style={{ position: 'absolute', top: -80, left: '50%', transform: 'translateX(-50%)', width: 500, height: 300, background: 'radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%)', pointerEvents: 'none' }} />
           <div style={{ position: 'relative' }}>
-            <h2 style={{ fontSize: 'clamp(26px, 4vw, 38px)', fontWeight: 900, marginBottom: 16, letterSpacing: -0.5, lineHeight: 1.2 }}>Ready to get your business online?</h2>
+            <h2 style={{ fontSize: 'clamp(26px, 4vw, 38px)', fontWeight: 900, marginBottom: 16, letterSpacing: -0.5, lineHeight: 1.2 }}>{ctaTitle}</h2>
             <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.4)', marginBottom: 40, lineHeight: 1.7, maxWidth: 440, margin: '0 auto 40px' }}>
-              Send us a message and we&apos;ll reply within 24 hours. No sales pitch — just a real conversation about what you need.
+              {ctaSubtitle}
             </p>
-            <a href="mailto:contact@mjagency.com?subject=Website Quote Request" style={{ display: 'inline-block', background: '#F59E0B', borderRadius: 10, padding: '16px 40px', color: '#000', fontSize: 15, fontWeight: 700, textDecoration: 'none', letterSpacing: 0.2 }}>
-              Start the Conversation
+            <a href={`mailto:${email}?subject=Website Quote Request`} style={{ display: 'inline-block', background: primary, borderRadius: 10, padding: '16px 40px', color: '#000', fontSize: 15, fontWeight: 700, textDecoration: 'none', letterSpacing: 0.2 }}>
+              {ctaButton}
             </a>
           </div>
         </div>
@@ -248,8 +274,8 @@ export default function HomePage() {
       {/* Footer */}
       <footer className="lp-footer" style={{ position: 'relative', zIndex: 1, borderTop: '1px solid rgba(255,255,255,0.05)', padding: '28px 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ width: 28, height: 28, background: '#F59E0B', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 10, color: '#000' }}>MJ</div>
-          <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.25)' }}>© 2026 MJ Agency. All rights reserved.</span>
+          <div style={{ width: 28, height: 28, background: primary, borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 10, color: '#000' }}>{letters}</div>
+          <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.25)' }}>{copyright}</span>
         </div>
         <a href="/login" style={{ fontSize: 13, color: 'rgba(255,255,255,0.25)', textDecoration: 'none', fontWeight: 600 }}>Client Login</a>
       </footer>

@@ -2,7 +2,7 @@
 export const dynamic = 'force-dynamic'
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase, type Client } from '@/lib/supabase'
+import { supabase, type Client, type AgencyContent } from '@/lib/supabase'
 
 // ── Theme ────────────────────────────────────────────────────────────────────
 const T = {
@@ -33,7 +33,7 @@ const PLAN_PRICES: Record<string, number> = { starter: 49, pro: 149, agency: 299
 const PLAN_COLORS: Record<string, string> = { starter: '#10B981', pro: '#F59E0B', agency: '#8B5CF6' }
 const STATUS_COLORS: Record<string, string> = { active: '#10B981', inactive: '#555' }
 
-type Section = 'Dashboard' | 'Clients' | 'Pipeline' | 'Intakes' | 'Analytics' | 'Settings'
+type Section = 'Dashboard' | 'Clients' | 'Pipeline' | 'Intakes' | 'Analytics' | 'Settings' | 'Agency'
 
 const NAV: { icon: string; label: Section }[] = [
   { icon: '◈', label: 'Dashboard' },
@@ -42,6 +42,7 @@ const NAV: { icon: string; label: Section }[] = [
   { icon: '◫', label: 'Intakes' },
   { icon: '◎', label: 'Analytics' },
   { icon: '⊕', label: 'Settings' },
+  { icon: '⬡', label: 'Agency' },
 ]
 
 type PipelineLead = {
@@ -85,6 +86,35 @@ function slugify(name: string) {
   return name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
 }
 
+const DEFAULT_AGENCY: AgencyContent = {
+  id: '',
+  company_name: 'MJ Agency', logo_letters: 'MJ',
+  primary_color: '#F59E0B', accent_color: '#FCD34D',
+  contact_email: 'contact@mjagency.com',
+  hero_badge: 'Web Design & Development',
+  hero_headline_1: 'Your business deserves', hero_headline_2: 'a website that works.',
+  hero_subtitle: 'We build fast, modern websites for local businesses — and hand you a dashboard so you can update it yourself, any time.',
+  hero_cta_primary: 'Get a Free Quote', hero_cta_secondary: 'See Our Work',
+  stat_1_val: '7-Day', stat_1_label: 'Average delivery',
+  stat_2_val: '100%', stat_2_label: 'Mobile optimized',
+  stat_3_val: 'You Own', stat_3_label: 'Your dashboard & code',
+  stat_4_val: '24hr', stat_4_label: 'Response time',
+  process_title: 'Simple from start to finish',
+  services_title: 'Everything your business needs online',
+  pricing_title: 'Straightforward pricing',
+  pricing_subtitle: 'One-time setup fee + a low monthly to keep everything running.',
+  cta_title: 'Ready to get your business online?',
+  cta_subtitle: "Send us a message and we'll reply within 24 hours. No sales pitch — just a real conversation about what you need.",
+  cta_button: 'Start the Conversation',
+  footer_copyright: '© 2026 MJ Agency. All rights reserved.',
+  pricing_plans: [
+    { name: 'Starter', price: '$499', monthly: '$79/mo', desc: 'Perfect for getting your business online fast.', features: ['1-page professional website', 'Mobile-friendly design', 'Your own content dashboard', 'Contact form', '1 revision round'], highlight: false },
+    { name: 'Pro', price: '$999', monthly: '$149/mo', desc: 'For businesses ready to grow their online presence.', features: ['Up to 5 pages', 'Product or services catalog', 'Full content dashboard', 'Image & color control', 'Priority support', '3 revision rounds'], highlight: true },
+    { name: 'Custom', price: "Let's talk", monthly: null, desc: 'For businesses with specific needs or multiple locations.', features: ['Everything in Pro', 'Custom features & integrations', 'E-commerce ready', 'Multiple team logins', 'Ongoing retainer available'], highlight: false },
+  ],
+  updated_at: '',
+}
+
 export default function AdminPage() {
   const router = useRouter()
   const [section, setSection]   = useState<Section>('Dashboard')
@@ -111,6 +141,9 @@ export default function AdminPage() {
   const [importRows, setImportRows] = useState<Partial<PipelineLead>[]>([])
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const [hasLocalLeads, setHasLocalLeads] = useState(false)
+  const [agencyContent, setAgencyContent] = useState<AgencyContent | null>(null)
+  const [agencySaving, setAgencySaving] = useState(false)
+  const [agencyTab, setAgencyTab] = useState<'Branding' | 'Hero' | 'Stats' | 'Sections' | 'Pricing'>('Branding')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const [form, setForm] = useState({
@@ -151,6 +184,11 @@ export default function AdminPage() {
     if (data) setLeads(data.map(r => ({ ...r, createdAt: r.created_at })))
   }, [])
 
+  const loadAgency = useCallback(async () => {
+    const { data } = await supabase.from('agency_content').select('*').single()
+    if (data) setAgencyContent(data)
+  }, [])
+
   useEffect(() => {
     try {
       const saved = localStorage.getItem('mj_pipeline')
@@ -181,6 +219,17 @@ export default function AdminPage() {
     } catch { showToast('Migration failed', 'error') }
   }
 
+  async function saveAgency() {
+    const content = agencyContent ?? DEFAULT_AGENCY
+    setAgencySaving(true)
+    const { error } = await supabase
+      .from('agency_content')
+      .upsert({ ...content, updated_at: new Date().toISOString() })
+    setAgencySaving(false)
+    if (error) showToast('Error: ' + error.message, 'error')
+    else showToast('Agency site updated ✓')
+  }
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session) { router.replace('/login'); return }
@@ -190,8 +239,9 @@ export default function AdminPage() {
       loadClients()
       loadIntakes()
       loadLeads()
+      loadAgency()
     })
-  }, [router, loadClients, loadIntakes, loadLeads])
+  }, [router, loadClients, loadIntakes, loadLeads, loadAgency])
 
   function updateForm(key: string, value: string) {
     setForm(f => {
@@ -1012,6 +1062,205 @@ export default function AdminPage() {
     )
   }
 
+  // ── Agency Site Editor ────────────────────────────────────────────────────
+  function renderAgency() {
+    const ag = agencyContent ?? DEFAULT_AGENCY
+    const set = (field: keyof AgencyContent, val: unknown) =>
+      setAgencyContent(prev => ({ ...(prev ?? DEFAULT_AGENCY), [field]: val } as AgencyContent))
+    const updatePlan = (i: number, key: string, val: unknown) => {
+      const plans = ag.pricing_plans.map((p, j) => j === i ? { ...p, [key]: val } : p)
+      set('pricing_plans', plans)
+    }
+    const inp: React.CSSProperties = {
+      width: '100%', boxSizing: 'border-box', background: T.input,
+      border: `1px solid ${T.border}`, borderRadius: 10,
+      padding: '11px 14px', color: T.text, fontSize: 14, outline: 'none', fontFamily: 'inherit',
+    }
+    const lbl: React.CSSProperties = {
+      display: 'block', fontSize: 11, fontWeight: 700,
+      color: T.textDim, letterSpacing: 0.5, marginBottom: 7,
+    }
+    const fg = (label: string, field: keyof AgencyContent, multiline = false) => (
+      <div>
+        <label style={lbl}>{label}</label>
+        {multiline
+          ? <textarea rows={3} value={String(ag[field])} onChange={e => set(field, e.target.value)} style={{ ...inp, resize: 'vertical', lineHeight: 1.6 }} />
+          : <input value={String(ag[field])} onChange={e => set(field, e.target.value)} style={inp} />
+        }
+      </div>
+    )
+
+    return (
+      <>
+        <div className="admin-section-hdr" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 32 }}>
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: T.textDim, letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 6 }}>Landing Page</div>
+            <h1 style={{ fontSize: 32, fontWeight: 900, margin: 0, letterSpacing: -1 }}>Agency Site</h1>
+          </div>
+          <div className="admin-header-actions" style={{ display: 'flex', gap: 10 }}>
+            <button onClick={() => window.open('/', '_blank')} style={{ background: 'rgba(255,255,255,0.06)', border: `1px solid ${T.borderStrong}`, borderRadius: 12, padding: '13px 20px', color: T.textMuted, fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+              Preview ↗
+            </button>
+            <button onClick={saveAgency} disabled={agencySaving} style={{ background: T.accent, border: 'none', borderRadius: 12, padding: '13px 28px', color: '#000', fontSize: 14, fontWeight: 800, cursor: 'pointer', opacity: agencySaving ? 0.7 : 1 }}>
+              {agencySaving ? 'Saving…' : 'Save Changes'}
+            </button>
+          </div>
+        </div>
+
+        {/* Tabs */}
+        <div style={{ display: 'flex', gap: 4, marginBottom: 28, background: T.card, borderRadius: 12, padding: 4, width: 'fit-content', border: `1px solid ${T.border}` }}>
+          {(['Branding', 'Hero', 'Stats', 'Sections', 'Pricing'] as const).map(t => (
+            <button key={t} onClick={() => setAgencyTab(t)} style={{
+              background: agencyTab === t ? T.bg : 'transparent',
+              border: `1px solid ${agencyTab === t ? T.borderStrong : 'transparent'}`,
+              borderRadius: 8, padding: '8px 16px',
+              color: agencyTab === t ? T.text : T.textMuted,
+              fontSize: 13, fontWeight: agencyTab === t ? 700 : 400, cursor: 'pointer',
+            }}>{t}</button>
+          ))}
+        </div>
+
+        <div style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 16, padding: 32 }}>
+
+          {agencyTab === 'Branding' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20, maxWidth: 560 }}>
+              {fg('Company Name', 'company_name')}
+              {fg('Logo Letters', 'logo_letters')}
+              {fg('Contact Email', 'contact_email')}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                <div>
+                  <label style={lbl}>Primary Color</label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <input type="color" value={ag.primary_color} onChange={e => set('primary_color', e.target.value)}
+                      style={{ width: 44, height: 44, border: `1px solid ${T.border}`, borderRadius: 8, background: 'none', cursor: 'pointer', padding: 2, flexShrink: 0 }} />
+                    <input value={ag.primary_color} onChange={e => set('primary_color', e.target.value)} style={{ ...inp }} placeholder="#F59E0B" />
+                  </div>
+                </div>
+                <div>
+                  <label style={lbl}>Accent Color</label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <input type="color" value={ag.accent_color} onChange={e => set('accent_color', e.target.value)}
+                      style={{ width: 44, height: 44, border: `1px solid ${T.border}`, borderRadius: 8, background: 'none', cursor: 'pointer', padding: 2, flexShrink: 0 }} />
+                    <input value={ag.accent_color} onChange={e => set('accent_color', e.target.value)} style={{ ...inp }} placeholder="#FCD34D" />
+                  </div>
+                </div>
+              </div>
+              <div style={{ background: T.accentDim, border: `1px solid ${T.accentBorder}`, borderRadius: 10, padding: '12px 16px', fontSize: 12, color: T.accentText }}>
+                Primary color updates your nav logo, hero badge, CTA buttons, and footer. Changes go live after you save.
+              </div>
+            </div>
+          )}
+
+          {agencyTab === 'Hero' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20, maxWidth: 560 }}>
+              {fg('Badge Text', 'hero_badge')}
+              {fg('Headline Line 1', 'hero_headline_1')}
+              {fg('Headline Line 2 (shown dim)', 'hero_headline_2')}
+              {fg('Subtitle', 'hero_subtitle', true)}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                {fg('Primary CTA Button', 'hero_cta_primary')}
+                {fg('Secondary CTA Button', 'hero_cta_secondary')}
+              </div>
+            </div>
+          )}
+
+          {agencyTab === 'Stats' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 560 }}>
+              <div style={{ fontSize: 13, color: T.textMuted, marginBottom: 4 }}>The 4 stats shown below your hero section.</div>
+              {([
+                { n: 1, val: ag.stat_1_val, label: ag.stat_1_label, vk: 'stat_1_val' as const, lk: 'stat_1_label' as const },
+                { n: 2, val: ag.stat_2_val, label: ag.stat_2_label, vk: 'stat_2_val' as const, lk: 'stat_2_label' as const },
+                { n: 3, val: ag.stat_3_val, label: ag.stat_3_label, vk: 'stat_3_val' as const, lk: 'stat_3_label' as const },
+                { n: 4, val: ag.stat_4_val, label: ag.stat_4_label, vk: 'stat_4_val' as const, lk: 'stat_4_label' as const },
+              ]).map(({ n, val, label, vk, lk }) => (
+                <div key={n} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                  <div>
+                    <label style={lbl}>Stat {n} — Value</label>
+                    <input value={val} onChange={e => set(vk, e.target.value)} style={inp} />
+                  </div>
+                  <div>
+                    <label style={lbl}>Stat {n} — Label</label>
+                    <input value={label} onChange={e => set(lk, e.target.value)} style={inp} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {agencyTab === 'Sections' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20, maxWidth: 560 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: T.textMuted }}>Section Headings</div>
+              {fg('Process Section Title', 'process_title')}
+              {fg('Services Section Title', 'services_title')}
+              <div style={{ height: 1, background: T.border }} />
+              <div style={{ fontSize: 13, fontWeight: 700, color: T.textMuted }}>Pricing Section</div>
+              {fg('Pricing Title', 'pricing_title')}
+              {fg('Pricing Subtitle', 'pricing_subtitle')}
+              <div style={{ height: 1, background: T.border }} />
+              <div style={{ fontSize: 13, fontWeight: 700, color: T.textMuted }}>Call-to-Action</div>
+              {fg('CTA Title', 'cta_title')}
+              {fg('CTA Subtitle', 'cta_subtitle', true)}
+              {fg('CTA Button Text', 'cta_button')}
+              <div style={{ height: 1, background: T.border }} />
+              {fg('Footer Copyright', 'footer_copyright')}
+            </div>
+          )}
+
+          {agencyTab === 'Pricing' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+              {ag.pricing_plans.map((plan, i) => (
+                <div key={i} style={{ background: T.cardAlt, border: `1px solid ${T.border}`, borderRadius: 14, padding: 24 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+                    <div style={{ fontSize: 14, fontWeight: 800 }}>Plan {i + 1}</div>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13, color: T.textMuted }}>
+                      <input
+                        type="checkbox"
+                        checked={plan.highlight}
+                        onChange={e => {
+                          const plans = ag.pricing_plans.map((p, j) => ({ ...p, highlight: j === i ? e.target.checked : false }))
+                          set('pricing_plans', plans)
+                        }}
+                      />
+                      Highlight as &ldquo;Most Popular&rdquo;
+                    </label>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
+                    <div>
+                      <label style={lbl}>Name</label>
+                      <input value={plan.name} onChange={e => updatePlan(i, 'name', e.target.value)} style={inp} />
+                    </div>
+                    <div>
+                      <label style={lbl}>Setup Price</label>
+                      <input value={plan.price} onChange={e => updatePlan(i, 'price', e.target.value)} style={inp} placeholder="$999" />
+                    </div>
+                    <div>
+                      <label style={lbl}>Monthly (leave blank for none)</label>
+                      <input value={plan.monthly ?? ''} onChange={e => updatePlan(i, 'monthly', e.target.value || null)} style={inp} placeholder="$149/mo" />
+                    </div>
+                    <div>
+                      <label style={lbl}>Description</label>
+                      <input value={plan.desc} onChange={e => updatePlan(i, 'desc', e.target.value)} style={inp} />
+                    </div>
+                  </div>
+                  <div>
+                    <label style={lbl}>Features (one per line)</label>
+                    <textarea
+                      rows={5}
+                      value={plan.features.join('\n')}
+                      onChange={e => updatePlan(i, 'features', e.target.value.split('\n').filter(f => f.trim()))}
+                      style={{ ...inp, resize: 'vertical', lineHeight: 1.7 }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+        </div>
+      </>
+    )
+  }
+
   // ── Shell ─────────────────────────────────────────────────────────────────
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: T.bg, color: T.text, fontFamily: 'var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' }}>
@@ -1108,6 +1357,7 @@ export default function AdminPage() {
         {section === 'Intakes'   && renderIntakes()}
         {section === 'Analytics' && renderAnalytics()}
         {section === 'Settings'  && renderSettings()}
+        {section === 'Agency'    && renderAgency()}
       </div>
 
       {/* ── Add Client Modal ── */}
