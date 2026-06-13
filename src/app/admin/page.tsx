@@ -496,12 +496,12 @@ export default function AdminPage() {
   function KPI({ label, value, sub, color, icon }: { label: string; value: string | number; sub?: string; color?: string; icon: string }) {
     const c = color || T.text
     return (
-      <div style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 16, overflow: 'hidden' }}>
-        <div style={{ height: 3, background: `linear-gradient(90deg, ${c}80, ${c}20)` }} />
+      <div className="admin-kpi-card" style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 16, overflow: 'hidden', position: 'relative' }}>
+        <div className="admin-kpi-strip" style={{ height: 3, background: `linear-gradient(90deg, ${c}, ${c}30)`, transition: 'height 0.22s ease' }} />
         <div style={{ padding: 24 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
             <span style={{ fontSize: 11, fontWeight: 600, color: T.textMuted, letterSpacing: 0.5, textTransform: 'uppercase' }}>{label}</span>
-            <span style={{ fontSize: 22, lineHeight: 1 }}>{icon}</span>
+            <span className="admin-kpi-icon" style={{ fontSize: 22, lineHeight: 1, display: 'block', transition: 'transform 0.24s cubic-bezier(0.22,1,0.36,1)' }}>{icon}</span>
           </div>
           <div style={{ fontSize: 34, fontWeight: 900, color: c, lineHeight: 1, letterSpacing: -1 }}>{value}</div>
           {sub && <div style={{ fontSize: 12, color: T.textDim, marginTop: 6 }}>{sub}</div>}
@@ -519,7 +519,7 @@ export default function AdminPage() {
             <div style={{ fontSize: 11, fontWeight: 700, color: T.accentText, letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 6 }}>Overview</div>
             <h1 style={{ fontSize: 32, fontWeight: 900, margin: 0, letterSpacing: -1 }}>Dashboard</h1>
           </div>
-          <button onClick={() => setShowModal(true)} style={{ background: T.accent, border: 'none', borderRadius: 12, padding: '13px 24px', color: '#000', fontSize: 14, fontWeight: 800, cursor: 'pointer' }}>
+          <button className="admin-amber-btn" onClick={() => setShowModal(true)} style={{ background: T.accent, border: 'none', borderRadius: 12, padding: '13px 24px', color: '#000', fontSize: 14, fontWeight: 800, cursor: 'pointer' }}>
             + Add Client
           </button>
         </div>
@@ -595,7 +595,7 @@ export default function AdminPage() {
                       <div style={{ fontSize: 13, fontWeight: 800, color: PLAN_COLORS[client.plan] }}>${PLAN_PRICES[client.plan]}/mo</div>
                       <div style={{ fontSize: 10, color: T.textDim, marginTop: 1, textTransform: 'capitalize' }}>{client.plan}</div>
                     </div>
-                    <button onClick={() => router.push(`/editor?clientId=${client.id}`)} style={{ background: T.accentDim, border: `1px solid ${T.accentBorder}`, borderRadius: 8, padding: '6px 12px', color: T.accentText, fontSize: 11, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>Edit</button>
+                    <button className="admin-edit-btn" onClick={() => router.push(`/editor?clientId=${client.id}`)} style={{ background: T.accentDim, border: `1px solid ${T.accentBorder}`, borderRadius: 8, padding: '6px 12px', color: T.accentText, fontSize: 11, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>Edit →</button>
                   </div>
                 ))}
               </div>
@@ -614,7 +614,7 @@ export default function AdminPage() {
               { label: 'Analytics',        action: () => setSection('Analytics') },
               { label: 'Settings',         action: () => setSection('Settings') },
             ].map(a => (
-              <button key={a.label} onClick={a.action} style={{
+              <button key={a.label} className={a.primary ? 'admin-amber-btn' : 'admin-quick-btn'} onClick={a.action} style={{
                 background: a.primary ? T.accent : a.alert ? 'rgba(239,68,68,0.1)' : T.accentDim,
                 border: `1px solid ${a.primary ? 'transparent' : a.alert ? 'rgba(239,68,68,0.25)' : T.accentBorder}`,
                 borderRadius: 10, padding: '10px 18px',
@@ -648,7 +648,7 @@ export default function AdminPage() {
               />
               <span style={{ position: 'absolute', left: 13, top: '50%', transform: 'translateY(-50%)', fontSize: 14, opacity: 0.3, pointerEvents: 'none' }}>⌕</span>
             </div>
-            <button onClick={() => setShowModal(true)} style={{ background: T.accent, border: 'none', borderRadius: 10, padding: '10px 22px', color: '#000', fontSize: 14, fontWeight: 800, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+            <button className="admin-amber-btn" onClick={() => setShowModal(true)} style={{ background: T.accent, border: 'none', borderRadius: 10, padding: '10px 22px', color: '#000', fontSize: 14, fontWeight: 800, cursor: 'pointer', whiteSpace: 'nowrap' }}>
               + Add Client
             </button>
           </div>
@@ -668,12 +668,12 @@ export default function AdminPage() {
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 16 }}>
             {filtered.map(client => (
-              <div key={client.id} style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 16, overflow: 'hidden' }}>
+              <div key={client.id} className="admin-client-card" style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 16, overflow: 'hidden', position: 'relative' }}>
                 {/* Brand color strip */}
-                <div style={{ height: 3, background: `linear-gradient(90deg, ${client.portal_color || T.accent}, ${client.portal_accent || client.portal_color || T.accent}60)` }} />
+                <div className="admin-client-strip" style={{ height: 3, background: `linear-gradient(90deg, ${client.portal_color || T.accent}, ${client.portal_accent || client.portal_color || T.accent}60)`, transition: 'height 0.22s ease' }} />
                 <div style={{ padding: '20px 20px 16px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
-                    <div style={{ width: 44, height: 44, borderRadius: 12, flexShrink: 0, background: `linear-gradient(135deg, ${client.portal_color || T.accent}, ${client.portal_color || T.accent}BB)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 17, fontWeight: 900, color: '#fff' }}>
+                    <div className="admin-client-logo" style={{ width: 44, height: 44, borderRadius: 12, flexShrink: 0, background: `linear-gradient(135deg, ${client.portal_color || T.accent}, ${client.portal_color || T.accent}BB)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 17, fontWeight: 900, color: '#fff' }}>
                       {client.logo_letter || client.business_name[0]?.toUpperCase() || 'B'}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
@@ -697,7 +697,7 @@ export default function AdminPage() {
                   </div>
 
                   <div style={{ display: 'flex', gap: 8, borderTop: `1px solid ${T.border}`, paddingTop: 14 }}>
-                    <button onClick={() => router.push(`/editor?clientId=${client.id}`)} style={{ flex: 1, background: T.accentDim, border: `1px solid ${T.accentBorder}`, borderRadius: 8, padding: '9px', color: T.accentText, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Edit</button>
+                    <button className="admin-edit-btn" onClick={() => router.push(`/editor?clientId=${client.id}`)} style={{ flex: 1, background: T.accentDim, border: `1px solid ${T.accentBorder}`, borderRadius: 8, padding: '9px', color: T.accentText, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Edit →</button>
                     <button onClick={() => setLinksClient(client)} style={{ background: 'rgba(255,215,0,0.08)', border: '1px solid rgba(255,215,0,0.2)', borderRadius: 8, padding: '9px 12px', color: '#FFD700', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Links</button>
                     <button onClick={() => setOwner(client)} title="Set as site owner" style={{ background: `rgba(139,92,246,0.08)`, border: '1px solid rgba(139,92,246,0.2)', borderRadius: 8, padding: '9px 12px', color: '#8B5CF6', fontSize: 13, cursor: 'pointer' }}>👑</button>
                     {client.site_url && (
@@ -727,7 +727,7 @@ export default function AdminPage() {
             <button onClick={() => fileInputRef.current?.click()} style={{ background: 'rgba(255,255,255,0.06)', border: `1px solid ${T.borderStrong}`, borderRadius: 12, padding: '13px 20px', color: T.textMuted, fontSize: 14, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
               ⬆ CSV
             </button>
-            <button onClick={() => setShowLeadModal(true)} style={{ background: T.accent, border: 'none', borderRadius: 12, padding: '13px 24px', color: '#000', fontSize: 14, fontWeight: 800, cursor: 'pointer' }}>
+            <button className="admin-amber-btn" onClick={() => setShowLeadModal(true)} style={{ background: T.accent, border: 'none', borderRadius: 12, padding: '13px 24px', color: '#000', fontSize: 14, fontWeight: 800, cursor: 'pointer' }}>
               + Add Lead
             </button>
           </div>
@@ -804,7 +804,7 @@ export default function AdminPage() {
                       )
                     }
                     return (
-                      <tr key={lead.id} style={{ borderTop: i > 0 ? `1px solid ${T.border}` : 'none' }}>
+                      <tr key={lead.id} className="admin-pipeline-row" style={{ borderTop: i > 0 ? `1px solid ${T.border}` : 'none' }}>
                         <td style={{ padding: '10px 14px' }}><EC field="business" val={lead.business} bold /></td>
                         <td style={{ padding: '10px 14px' }}><EC field="name" val={lead.name} /></td>
                         <td style={{ padding: '10px 14px' }}><EC field="email" val={lead.email} /></td>
@@ -1111,7 +1111,7 @@ export default function AdminPage() {
             <button onClick={() => window.open('/', '_blank')} style={{ background: 'rgba(255,255,255,0.06)', border: `1px solid ${T.borderStrong}`, borderRadius: 12, padding: '13px 20px', color: T.textMuted, fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
               Preview ↗
             </button>
-            <button onClick={saveAgency} disabled={agencySaving} style={{ background: T.accent, border: 'none', borderRadius: 12, padding: '13px 28px', color: '#000', fontSize: 14, fontWeight: 800, cursor: 'pointer', opacity: agencySaving ? 0.7 : 1 }}>
+            <button className="admin-amber-btn" onClick={saveAgency} disabled={agencySaving} style={{ background: T.accent, border: 'none', borderRadius: 12, padding: '13px 28px', color: '#000', fontSize: 14, fontWeight: 800, cursor: 'pointer', opacity: agencySaving ? 0.7 : 1 }}>
               {agencySaving ? 'Saving…' : 'Save Changes'}
             </button>
           </div>
@@ -1281,7 +1281,7 @@ export default function AdminPage() {
       )}
 
       {/* ── Sidebar ── */}
-      <div className={`admin-sidebar${mobileNavOpen ? ' open' : ''}`} style={{ width: 240, background: T.sidebar, borderRight: `1px solid ${T.border}`, display: 'flex', flexDirection: 'column', position: 'fixed', top: 0, bottom: 0, left: 0, zIndex: 100 }}>
+      <div className={`admin-sidebar${mobileNavOpen ? ' open' : ''}`} style={{ width: 240, background: 'linear-gradient(180deg, #181818 0%, #101010 100%)', borderRight: '1px solid rgba(245,158,11,0.08)', display: 'flex', flexDirection: 'column', position: 'fixed', top: 0, bottom: 0, left: 0, zIndex: 100 }}>
         {/* Logo — click to open landing page */}
         <div style={{ padding: '28px 20px 24px' }}>
           <div
@@ -1289,7 +1289,7 @@ export default function AdminPage() {
             title="View landing page"
             style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}
           >
-            <div style={{ width: 38, height: 38, background: T.accent, borderRadius: 11, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 14, color: '#000', flexShrink: 0, boxShadow: `0 0 18px rgba(245,158,11,0.35)` }}>MJ</div>
+            <div className="admin-mj-logo" style={{ width: 38, height: 38, background: T.accent, borderRadius: 11, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 14, color: '#000', flexShrink: 0 }}>MJ</div>
             <div>
               <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: 0.5 }}>MJ AGENCY</div>
               <div style={{ fontSize: 10, color: T.accentText, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase' }}>Admin</div>
@@ -1305,17 +1305,19 @@ export default function AdminPage() {
             return (
               <div
                 key={item.label}
+                className={`admin-nav-item${active ? ' admin-nav-active' : ''}`}
                 onClick={() => { setSection(item.label); setMobileNavOpen(false) }}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px',
                   borderRadius: 10, marginBottom: 2,
                   background: active ? T.accentDim : 'transparent',
-                  borderLeft: active ? `2px solid ${T.accent}` : '2px solid transparent',
+                  borderLeft: active ? `3px solid ${T.accent}` : '3px solid transparent',
                   color: active ? T.accentText : T.textMuted,
-                  fontSize: 14, fontWeight: active ? 600 : 400, cursor: 'pointer',
+                  fontSize: 14, fontWeight: active ? 700 : 400, cursor: 'pointer',
+                  position: 'relative',
                 }}
               >
-                <span style={{ fontFamily: 'monospace', width: 18, textAlign: 'center', flexShrink: 0, fontSize: 13 }}>{item.icon}</span>
+                <span className="admin-nav-icon" style={{ fontFamily: 'monospace', width: 18, textAlign: 'center', flexShrink: 0, fontSize: 13, transition: 'transform 0.18s ease' }}>{item.icon}</span>
                 <span style={{ flex: 1 }}>{item.label}</span>
                 {badge > 0 && (
                   <span style={{ background: T.error, borderRadius: 50, minWidth: 20, height: 20, padding: '0 5px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800, color: '#fff' }}>
@@ -1328,7 +1330,7 @@ export default function AdminPage() {
         </nav>
 
         {/* MRR widget */}
-        <div style={{ margin: '0 10px 12px', background: T.accentDim, border: `1px solid ${T.accentBorder}`, borderRadius: 14, padding: '16px 18px' }}>
+        <div className="admin-mrr-widget" style={{ margin: '0 10px 12px', background: T.accentDim, border: `1px solid ${T.accentBorder}`, borderRadius: 14, padding: '16px 18px', cursor: 'default' }}>
           <div style={{ fontSize: 10, color: T.accentText, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 4 }}>Monthly Revenue</div>
           <div style={{ fontSize: 26, fontWeight: 900, color: T.accentText, letterSpacing: -1 }}>${mrr.toLocaleString()}</div>
           <div style={{ fontSize: 10, color: T.textDim, marginTop: 3 }}>{stats.active} active client{stats.active !== 1 ? 's' : ''}</div>
@@ -1631,7 +1633,8 @@ export default function AdminPage() {
 
       {/* ── Toast ── */}
       {toast && (
-        <div style={{ position: 'fixed', bottom: 28, right: 28, background: '#141414', border: `1px solid ${toast.type === 'error' ? 'rgba(239,68,68,0.3)' : T.accentBorder}`, borderRadius: 12, padding: '14px 22px', fontSize: 14, fontWeight: 600, zIndex: 2000, boxShadow: '0 8px 32px rgba(0,0,0,0.6)', color: toast.type === 'error' ? T.error : T.text }}>
+        <div className="admin-toast" style={{ position: 'fixed', bottom: 28, right: 28, background: '#181818', border: `1px solid ${toast.type === 'error' ? 'rgba(239,68,68,0.35)' : 'rgba(245,158,11,0.35)'}`, borderRadius: 14, padding: '14px 22px', fontSize: 14, fontWeight: 600, zIndex: 2000, boxShadow: `0 8px 40px rgba(0,0,0,0.7), 0 0 0 1px ${toast.type === 'error' ? 'rgba(239,68,68,0.1)' : 'rgba(245,158,11,0.08)'}`, color: toast.type === 'error' ? T.error : T.text, display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ width: 8, height: 8, borderRadius: '50%', background: toast.type === 'error' ? T.error : T.accent, flexShrink: 0, display: 'block' }} />
           {toast.msg}
         </div>
       )}
@@ -1643,6 +1646,153 @@ export default function AdminPage() {
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.14); }
+
+        /* ── Keyframes ─────────────────────────────────────── */
+        @keyframes a-slide-up {
+          from { opacity: 0; transform: translateY(16px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes a-logo-pulse {
+          0%,100% { box-shadow: 0 0 14px rgba(245,158,11,0.4), 0 0 0 0 rgba(245,158,11,0); }
+          50%     { box-shadow: 0 0 28px rgba(245,158,11,0.75), 0 0 48px rgba(245,158,11,0.18); }
+        }
+        @keyframes a-mrr-glow {
+          0%,100% { border-color: rgba(245,158,11,0.25); }
+          50%     { border-color: rgba(245,158,11,0.55); box-shadow: inset 0 0 24px rgba(245,158,11,0.07); }
+        }
+        @keyframes a-toast-in {
+          from { opacity: 0; transform: translateX(28px) scale(0.94); }
+          to   { opacity: 1; transform: translateX(0) scale(1); }
+        }
+        @keyframes a-shimmer {
+          0%   { background-position: -300% center; }
+          100% { background-position:  300% center; }
+        }
+        @keyframes a-dot-blink {
+          0%,100% { opacity: 1; }
+          50%     { opacity: 0.35; }
+        }
+
+        /* ── Section entrance ───────────────────────────────── */
+        .admin-section-hdr { animation: a-slide-up 0.3s cubic-bezier(0.22,1,0.36,1); }
+
+        /* ── KPI cards ──────────────────────────────────────── */
+        .admin-kpi-card {
+          transition: transform 0.26s cubic-bezier(0.22,1,0.36,1),
+                      box-shadow 0.26s ease,
+                      border-color 0.26s ease !important;
+          cursor: default;
+        }
+        .admin-kpi-card:hover {
+          transform: translateY(-8px) scale(1.015) !important;
+          box-shadow: 0 22px 56px rgba(0,0,0,0.6), 0 0 0 1px rgba(245,158,11,0.2) !important;
+          border-color: rgba(245,158,11,0.2) !important;
+        }
+        .admin-kpi-card:hover .admin-kpi-strip { height: 4px !important; }
+        .admin-kpi-card:hover .admin-kpi-icon  { transform: scale(1.25) rotate(-8deg) !important; }
+
+        /* ── MJ logo ────────────────────────────────────────── */
+        .admin-mj-logo {
+          animation: a-logo-pulse 2.8s ease-in-out infinite !important;
+          transition: transform 0.2s cubic-bezier(0.22,1,0.36,1) !important;
+          cursor: pointer;
+        }
+        .admin-mj-logo:hover { transform: scale(1.14) rotate(-6deg) !important; }
+
+        /* ── Sidebar nav ────────────────────────────────────── */
+        .admin-nav-item {
+          transition: background 0.18s ease, transform 0.2s cubic-bezier(0.22,1,0.36,1), color 0.18s ease !important;
+        }
+        .admin-nav-item:hover:not(.admin-nav-active) {
+          background: rgba(245,158,11,0.07) !important;
+          color: rgba(252,211,77,0.9) !important;
+          transform: translateX(6px) !important;
+        }
+        .admin-nav-item:hover:not(.admin-nav-active) .admin-nav-icon {
+          transform: scale(1.2) !important;
+        }
+        .admin-nav-active {
+          box-shadow: inset 3px 0 0 rgba(245,158,11,0.2) !important;
+        }
+
+        /* ── MRR widget ─────────────────────────────────────── */
+        .admin-mrr-widget {
+          animation: a-mrr-glow 3.5s ease-in-out infinite !important;
+          transition: transform 0.22s ease !important;
+        }
+        .admin-mrr-widget:hover { transform: scale(1.03) !important; }
+
+        /* ── Client cards ───────────────────────────────────── */
+        .admin-client-card {
+          transition: transform 0.26s cubic-bezier(0.22,1,0.36,1),
+                      box-shadow 0.26s ease,
+                      border-color 0.26s ease !important;
+        }
+        .admin-client-card:hover {
+          transform: translateY(-7px) !important;
+          box-shadow: 0 20px 52px rgba(0,0,0,0.55) !important;
+          border-color: rgba(245,158,11,0.3) !important;
+        }
+        .admin-client-card:hover .admin-client-strip { height: 4px !important; }
+        .admin-client-logo {
+          transition: transform 0.26s cubic-bezier(0.22,1,0.36,1) !important;
+        }
+        .admin-client-card:hover .admin-client-logo {
+          transform: scale(1.15) rotate(-6deg) !important;
+        }
+
+        /* ── Edit buttons ───────────────────────────────────── */
+        .admin-edit-btn {
+          transition: background 0.16s ease, border-color 0.16s ease,
+                      box-shadow 0.16s ease, transform 0.16s ease !important;
+        }
+        .admin-edit-btn:hover {
+          background: rgba(245,158,11,0.18) !important;
+          border-color: rgba(245,158,11,0.5) !important;
+          box-shadow: 0 4px 14px rgba(245,158,11,0.25) !important;
+          transform: translateY(-2px) !important;
+        }
+
+        /* ── Primary amber buttons ──────────────────────────── */
+        .admin-amber-btn {
+          transition: transform 0.2s cubic-bezier(0.22,1,0.36,1), box-shadow 0.2s ease !important;
+        }
+        .admin-amber-btn:hover:not(:disabled) {
+          transform: translateY(-3px) !important;
+          box-shadow: 0 10px 30px rgba(245,158,11,0.5) !important;
+        }
+        .admin-amber-btn:active:not(:disabled) {
+          transform: translateY(-1px) !important;
+          box-shadow: 0 4px 14px rgba(245,158,11,0.35) !important;
+        }
+
+        /* ── Quick/secondary buttons ────────────────────────── */
+        .admin-quick-btn {
+          transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease !important;
+        }
+        .admin-quick-btn:hover {
+          transform: translateY(-2px) !important;
+          box-shadow: 0 6px 18px rgba(245,158,11,0.2) !important;
+          background: rgba(245,158,11,0.14) !important;
+        }
+
+        /* ── Pipeline table rows ────────────────────────────── */
+        .admin-pipeline-row {
+          transition: background 0.14s ease !important;
+        }
+        .admin-pipeline-row:hover {
+          background: rgba(245,158,11,0.04) !important;
+        }
+        .admin-pipeline-row:hover td:first-child {
+          color: rgba(252,211,77,0.9) !important;
+        }
+
+        /* ── Toast ──────────────────────────────────────────── */
+        .admin-toast {
+          animation: a-toast-in 0.32s cubic-bezier(0.22,1,0.36,1) !important;
+        }
+
+        /* ── Responsive ─────────────────────────────────────── */
         @media (max-width: 768px) {
           .admin-sidebar { transform: translateX(-100%); transition: transform 0.22s ease; }
           .admin-sidebar.open { transform: translateX(0) !important; }
