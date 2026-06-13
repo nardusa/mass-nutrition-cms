@@ -2,19 +2,19 @@
 export const dynamic = 'force-dynamic'
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase, type Client } from '@/lib/supabase'
+import { supabase, type Client, type AgencyContent } from '@/lib/supabase'
 
 // ── Theme ────────────────────────────────────────────────────────────────────
 const T = {
-  bg:           '#070707',
-  sidebar:      '#0A0A0A',
-  card:         '#0E0E0E',
-  cardAlt:      '#0B0B0B',
-  border:       'rgba(255,255,255,0.05)',
-  borderStrong: 'rgba(255,255,255,0.09)',
+  bg:           '#0A0A0A',
+  sidebar:      '#111111',
+  card:         '#141414',
+  cardAlt:      '#0F0F0F',
+  border:       'rgba(255,255,255,0.06)',
+  borderStrong: 'rgba(255,255,255,0.1)',
   accent:       '#F59E0B',
   accentDim:    'rgba(245,158,11,0.1)',
-  accentBorder: 'rgba(245,158,11,0.22)',
+  accentBorder: 'rgba(245,158,11,0.25)',
   accentText:   '#FCD34D',
   success:      '#10B981',
   successDim:   'rgba(16,185,129,0.1)',
@@ -23,9 +23,9 @@ const T = {
   errorDim:     'rgba(239,68,68,0.08)',
   purple:       '#8B5CF6',
   text:         '#fff',
-  textMuted:    'rgba(255,255,255,0.45)',
-  textDim:      'rgba(255,255,255,0.22)',
-  input:        '#070707',
+  textMuted:    'rgba(255,255,255,0.5)',
+  textDim:      'rgba(255,255,255,0.25)',
+  input:        '#0A0A0A',
 }
 
 // ── Config ───────────────────────────────────────────────────────────────────
@@ -33,7 +33,7 @@ const PLAN_PRICES: Record<string, number> = { starter: 49, pro: 149, agency: 299
 const PLAN_COLORS: Record<string, string> = { starter: '#10B981', pro: '#F59E0B', agency: '#8B5CF6' }
 const STATUS_COLORS: Record<string, string> = { active: '#10B981', inactive: '#555' }
 
-type Section = 'Dashboard' | 'Clients' | 'Pipeline' | 'Intakes' | 'Analytics' | 'Settings'
+type Section = 'Dashboard' | 'Clients' | 'Pipeline' | 'Intakes' | 'Analytics' | 'Settings' | 'Agency'
 
 const NAV: { icon: string; label: Section }[] = [
   { icon: '◈', label: 'Dashboard' },
@@ -42,6 +42,7 @@ const NAV: { icon: string; label: Section }[] = [
   { icon: '◫', label: 'Intakes' },
   { icon: '◎', label: 'Analytics' },
   { icon: '⊕', label: 'Settings' },
+  { icon: '⬡', label: 'Agency' },
 ]
 
 type PipelineLead = {
@@ -85,6 +86,35 @@ function slugify(name: string) {
   return name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
 }
 
+const DEFAULT_AGENCY: AgencyContent = {
+  id: '',
+  company_name: 'MJ Agency', logo_letters: 'MJ',
+  primary_color: '#F59E0B', accent_color: '#FCD34D',
+  contact_email: 'contact@mjagency.com',
+  hero_badge: 'Web Design & Development',
+  hero_headline_1: 'Your business deserves', hero_headline_2: 'a website that works.',
+  hero_subtitle: 'We build fast, modern websites for local businesses — and hand you a dashboard so you can update it yourself, any time.',
+  hero_cta_primary: 'Get a Free Quote', hero_cta_secondary: 'See Our Work',
+  stat_1_val: '7-Day', stat_1_label: 'Average delivery',
+  stat_2_val: '100%', stat_2_label: 'Mobile optimized',
+  stat_3_val: 'You Own', stat_3_label: 'Your dashboard & code',
+  stat_4_val: '24hr', stat_4_label: 'Response time',
+  process_title: 'Simple from start to finish',
+  services_title: 'Everything your business needs online',
+  pricing_title: 'Straightforward pricing',
+  pricing_subtitle: 'One-time setup fee + a low monthly to keep everything running.',
+  cta_title: 'Ready to get your business online?',
+  cta_subtitle: "Send us a message and we'll reply within 24 hours. No sales pitch — just a real conversation about what you need.",
+  cta_button: 'Start the Conversation',
+  footer_copyright: '© 2026 MJ Agency. All rights reserved.',
+  pricing_plans: [
+    { name: 'Starter', price: '$499', monthly: '$79/mo', desc: 'Perfect for getting your business online fast.', features: ['1-page professional website', 'Mobile-friendly design', 'Your own content dashboard', 'Contact form', '1 revision round'], highlight: false },
+    { name: 'Pro', price: '$999', monthly: '$149/mo', desc: 'For businesses ready to grow their online presence.', features: ['Up to 5 pages', 'Product or services catalog', 'Full content dashboard', 'Image & color control', 'Priority support', '3 revision rounds'], highlight: true },
+    { name: 'Custom', price: "Let's talk", monthly: null, desc: 'For businesses with specific needs or multiple locations.', features: ['Everything in Pro', 'Custom features & integrations', 'E-commerce ready', 'Multiple team logins', 'Ongoing retainer available'], highlight: false },
+  ],
+  updated_at: '',
+}
+
 export default function AdminPage() {
   const router = useRouter()
   const [section, setSection]   = useState<Section>('Dashboard')
@@ -109,6 +139,11 @@ export default function AdminPage() {
   const [editVal, setEditVal]   = useState('')
   const [showImportModal, setShowImportModal] = useState(false)
   const [importRows, setImportRows] = useState<Partial<PipelineLead>[]>([])
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
+  const [hasLocalLeads, setHasLocalLeads] = useState(false)
+  const [agencyContent, setAgencyContent] = useState<AgencyContent | null>(null)
+  const [agencySaving, setAgencySaving] = useState(false)
+  const [agencyTab, setAgencyTab] = useState<'Branding' | 'Hero' | 'Stats' | 'Sections' | 'Pricing'>('Branding')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const [form, setForm] = useState({
@@ -141,6 +176,66 @@ export default function AdminPage() {
     setIntakes(data || [])
   }, [])
 
+  const loadLeads = useCallback(async () => {
+    const { data } = await supabase
+      .from('pipeline_leads')
+      .select('*')
+      .order('created_at', { ascending: false })
+    if (data) setLeads(data.map(r => ({ ...r, createdAt: r.created_at })))
+  }, [])
+
+  const loadAgency = useCallback(async () => {
+    const { data } = await supabase.from('agency_content').select('*').single()
+    if (data) setAgencyContent(data)
+  }, [])
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('mj_pipeline')
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        if (Array.isArray(parsed) && parsed.length > 0) setHasLocalLeads(true)
+      }
+    } catch { /* no-op */ }
+  }, [])
+
+  async function migrateLocalLeads() {
+    try {
+      const saved = localStorage.getItem('mj_pipeline')
+      if (!saved) return
+      const local: PipelineLead[] = JSON.parse(saved)
+      if (!local.length) return
+      const rows = local.map(l => ({
+        name: l.name, business: l.business, email: l.email, phone: l.phone,
+        stage: l.stage, value: l.value, notes: l.notes,
+        created_at: l.createdAt || new Date().toISOString(),
+      }))
+      const { error } = await supabase.from('pipeline_leads').insert(rows)
+      if (error) { showToast('Migration failed: ' + error.message, 'error'); return }
+      localStorage.removeItem('mj_pipeline')
+      setHasLocalLeads(false)
+      await loadLeads()
+      showToast(`Migrated ${rows.length} lead${rows.length !== 1 ? 's' : ''} to cloud ✓`)
+    } catch { showToast('Migration failed', 'error') }
+  }
+
+  async function saveAgency() {
+    const content = agencyContent ?? DEFAULT_AGENCY
+    setAgencySaving(true)
+    // Strip empty id so Postgres generates the UUID on first insert
+    const { id, ...fields } = content
+    const payload = id ? { ...content, updated_at: new Date().toISOString() } : { ...fields, updated_at: new Date().toISOString() }
+    const { data, error } = await supabase
+      .from('agency_content')
+      .upsert(payload)
+      .select()
+      .single()
+    setAgencySaving(false)
+    if (error) { showToast('Error: ' + error.message, 'error'); return }
+    if (data) setAgencyContent(data)
+    showToast('Agency site updated ✓')
+  }
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session) { router.replace('/login'); return }
@@ -149,17 +244,10 @@ export default function AdminPage() {
       if (email !== process.env.NEXT_PUBLIC_ADMIN_EMAIL) { router.replace('/editor'); return }
       loadClients()
       loadIntakes()
+      loadLeads()
+      loadAgency()
     })
-    try {
-      const saved = localStorage.getItem('mj_pipeline')
-      if (saved) setLeads(JSON.parse(saved))
-    } catch { /* no-op */ }
-  }, [router, loadClients, loadIntakes])
-
-  function savePipeline(next: PipelineLead[]) {
-    setLeads(next)
-    localStorage.setItem('mj_pipeline', JSON.stringify(next))
-  }
+  }, [router, loadClients, loadIntakes, loadLeads, loadAgency])
 
   function updateForm(key: string, value: string) {
     setForm(f => {
@@ -262,24 +350,29 @@ export default function AdminPage() {
     loadIntakes()
   }
 
-  function addLead() {
-    const lead: PipelineLead = {
-      id: Date.now().toString(), ...leadForm,
-      value: Number(leadForm.value) || 149,
-      createdAt: new Date().toISOString(),
+  async function addLead() {
+    const row = {
+      name: leadForm.name, business: leadForm.business,
+      email: leadForm.email, phone: leadForm.phone,
+      stage: leadForm.stage, value: Number(leadForm.value) || 149,
+      notes: leadForm.notes,
     }
-    savePipeline([lead, ...leads])
+    const { data, error } = await supabase.from('pipeline_leads').insert(row).select().single()
+    if (error) { showToast('Error: ' + error.message, 'error'); return }
+    setLeads(prev => [{ ...data, createdAt: data.created_at }, ...prev])
     setLeadForm({ name: '', business: '', email: '', phone: '', stage: 'lead', value: '149', notes: '' })
     setShowLeadModal(false)
     showToast('Lead added to pipeline')
   }
 
-  function updateLeadStage(id: string, stage: PipelineLead['stage']) {
-    savePipeline(leads.map(l => l.id === id ? { ...l, stage } : l))
+  async function updateLeadStage(id: string, stage: PipelineLead['stage']) {
+    setLeads(prev => prev.map(l => l.id === id ? { ...l, stage } : l))
+    await supabase.from('pipeline_leads').update({ stage }).eq('id', id)
   }
 
-  function deleteLead(id: string) {
-    savePipeline(leads.filter(l => l.id !== id))
+  async function deleteLead(id: string) {
+    setLeads(prev => prev.filter(l => l.id !== id))
+    await supabase.from('pipeline_leads').delete().eq('id', id)
     showToast('Lead removed')
   }
 
@@ -288,11 +381,11 @@ export default function AdminPage() {
     setEditVal(val)
   }
 
-  function commitEdit() {
+  async function commitEdit() {
     if (!editCell) return
-    savePipeline(leads.map(l => l.id !== editCell.id ? l : {
-      ...l, [editCell.field]: editCell.field === 'value' ? (Number(editVal) || 0) : editVal,
-    }))
+    const value = editCell.field === 'value' ? (Number(editVal) || 0) : editVal
+    setLeads(prev => prev.map(l => l.id !== editCell.id ? l : { ...l, [editCell.field]: value }))
+    await supabase.from('pipeline_leads').update({ [editCell.field]: value }).eq('id', editCell.id)
     setEditCell(null)
   }
 
@@ -355,22 +448,20 @@ export default function AdminPage() {
     e.target.value = ''
   }
 
-  function confirmImport() {
-    const newLeads: PipelineLead[] = importRows.map((row, i) => ({
-      id: `import_${Date.now()}_${i}`,
-      business:  row.business || '',
-      name:      row.name     || '',
-      email:     row.email    || '',
-      phone:     row.phone    || '',
-      stage:     'lead',
-      value:     Number(row.value) || 149,
-      notes:     row.notes    || '',
-      createdAt: new Date().toISOString(),
+  async function confirmImport() {
+    const rows = importRows.map(row => ({
+      business: row.business || '', name: row.name || '',
+      email: row.email || '', phone: row.phone || '',
+      stage: 'lead' as const, value: Number(row.value) || 149,
+      notes: row.notes || '',
     }))
-    savePipeline([...newLeads, ...leads])
+    const { data, error } = await supabase.from('pipeline_leads').insert(rows).select()
+    if (error) { showToast('Import failed: ' + error.message, 'error'); return }
+    const imported = (data || []).map(r => ({ ...r, createdAt: r.created_at }))
+    setLeads(prev => [...imported, ...prev])
     setShowImportModal(false)
     setImportRows([])
-    showToast(`Imported ${newLeads.length} lead${newLeads.length !== 1 ? 's' : ''}`)
+    showToast(`Imported ${imported.length} lead${imported.length !== 1 ? 's' : ''}`)
   }
 
   // ── Computed ──────────────────────────────────────────────────────────────
@@ -404,16 +495,13 @@ export default function AdminPage() {
   // ── KPI Card ──────────────────────────────────────────────────────────────
   function KPI({ label, value, sub, color, icon }: { label: string; value: string | number; sub?: string; color?: string; icon: string }) {
     return (
-      <div style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 16, overflow: 'hidden', boxShadow: color === T.accentText ? `0 4px 20px rgba(245,158,11,0.08)` : 'none' }}>
-        <div style={{ height: 2, background: color ? `linear-gradient(90deg, ${color}60, transparent)` : `linear-gradient(90deg, rgba(255,255,255,0.06), transparent)` }} />
-        <div style={{ padding: 24 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
-            <span style={{ fontSize: 10, fontWeight: 700, color: T.textDim, letterSpacing: 1.2, textTransform: 'uppercase' }}>{label}</span>
-            <span style={{ fontSize: 18, lineHeight: 1, opacity: 0.7 }}>{icon}</span>
-          </div>
-          <div style={{ fontSize: 36, fontWeight: 900, color: color || T.text, lineHeight: 1, letterSpacing: -1.5 }}>{value}</div>
-          {sub && <div style={{ fontSize: 11, color: T.textDim, marginTop: 8, fontWeight: 500 }}>{sub}</div>}
+      <div style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 16, padding: 24 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
+          <span style={{ fontSize: 11, fontWeight: 600, color: T.textMuted, letterSpacing: 0.5, textTransform: 'uppercase' }}>{label}</span>
+          <span style={{ fontSize: 22, lineHeight: 1 }}>{icon}</span>
         </div>
+        <div style={{ fontSize: 34, fontWeight: 900, color: color || T.text, lineHeight: 1, letterSpacing: -1 }}>{value}</div>
+        {sub && <div style={{ fontSize: 12, color: T.textDim, marginTop: 6 }}>{sub}</div>}
       </div>
     )
   }
@@ -422,10 +510,10 @@ export default function AdminPage() {
   function renderDashboard() {
     return (
       <>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 36 }}>
+        <div className="admin-section-hdr" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 36 }}>
           <div>
-            <div style={{ fontSize: 10, fontWeight: 700, color: T.accentText, letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 8, opacity: 0.75 }}>Overview</div>
-            <h1 style={{ fontSize: 34, fontWeight: 900, margin: 0, letterSpacing: -1.2, lineHeight: 1.05 }}>Dashboard</h1>
+            <div style={{ fontSize: 11, fontWeight: 700, color: T.textDim, letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 6 }}>Overview</div>
+            <h1 style={{ fontSize: 32, fontWeight: 900, margin: 0, letterSpacing: -1 }}>Dashboard</h1>
           </div>
           <button onClick={() => setShowModal(true)} style={{ background: T.accent, border: 'none', borderRadius: 12, padding: '13px 24px', color: '#000', fontSize: 14, fontWeight: 800, cursor: 'pointer' }}>
             + Add Client
@@ -433,7 +521,7 @@ export default function AdminPage() {
         </div>
 
         {/* KPIs */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16, marginBottom: 28 }}>
+        <div className="admin-kpis" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16, marginBottom: 28 }}>
           <KPI label="Monthly Revenue"  value={`$${mrr.toLocaleString()}`}  sub={`$${arr.toLocaleString()} ARR`}                color={T.accentText} icon="💰" />
           <KPI label="Active Clients"   value={stats.active}                sub={`${stats.total} total`}                          color={T.success}    icon="✓"  />
           <KPI label="Pipeline Value"   value={`$${pipelineValue.toLocaleString()}`} sub={`${activeLeads} active lead${activeLeads !== 1 ? 's' : ''}`} color="#F59E0B" icon="▷" />
@@ -441,7 +529,7 @@ export default function AdminPage() {
         </div>
 
         {/* Revenue breakdown + Recent clients */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.6fr', gap: 20, marginBottom: 20 }}>
+        <div className="admin-rev-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1.6fr', gap: 20, marginBottom: 20 }}>
           {/* Revenue by plan */}
           <div style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 16, padding: 28 }}>
             <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 22, color: T.text }}>Revenue by Plan</div>
@@ -542,15 +630,16 @@ export default function AdminPage() {
   function renderClients() {
     return (
       <>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 36 }}>
+        <div className="admin-section-hdr" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 36 }}>
           <div>
-            <div style={{ fontSize: 10, fontWeight: 700, color: T.accentText, letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 8, opacity: 0.75 }}>Management</div>
-            <h1 style={{ fontSize: 34, fontWeight: 900, margin: 0, letterSpacing: -1.2, lineHeight: 1.05 }}>Clients</h1>
+            <div style={{ fontSize: 11, fontWeight: 700, color: T.textDim, letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 6 }}>Management</div>
+            <h1 style={{ fontSize: 32, fontWeight: 900, margin: 0, letterSpacing: -1 }}>Clients</h1>
           </div>
-          <div style={{ display: 'flex', gap: 12 }}>
+          <div className="admin-header-actions" style={{ display: 'flex', gap: 10 }}>
             <div style={{ position: 'relative' }}>
               <input
-                style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 10, padding: '10px 16px 10px 40px', color: T.text, fontSize: 13, width: 240, outline: 'none', fontFamily: 'inherit' }}
+                className="admin-search-input"
+                style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 10, padding: '10px 16px 10px 40px', color: T.text, fontSize: 13, width: 220, outline: 'none', fontFamily: 'inherit' }}
                 placeholder="Search clients…" value={search} onChange={e => setSearch(e.target.value)}
               />
               <span style={{ position: 'absolute', left: 13, top: '50%', transform: 'translateY(-50%)', fontSize: 14, opacity: 0.3, pointerEvents: 'none' }}>⌕</span>
@@ -625,14 +714,14 @@ export default function AdminPage() {
   function renderPipeline() {
     return (
       <>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 36 }}>
+        <div className="admin-section-hdr" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 36 }}>
           <div>
-            <div style={{ fontSize: 10, fontWeight: 700, color: T.accentText, letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 8, opacity: 0.75 }}>Sales</div>
-            <h1 style={{ fontSize: 34, fontWeight: 900, margin: 0, letterSpacing: -1.2, lineHeight: 1.05 }}>Pipeline</h1>
+            <div style={{ fontSize: 11, fontWeight: 700, color: T.textDim, letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 6 }}>Sales</div>
+            <h1 style={{ fontSize: 32, fontWeight: 900, margin: 0, letterSpacing: -1 }}>Pipeline</h1>
           </div>
-          <div style={{ display: 'flex', gap: 10 }}>
+          <div className="admin-header-actions" style={{ display: 'flex', gap: 10 }}>
             <button onClick={() => fileInputRef.current?.click()} style={{ background: 'rgba(255,255,255,0.06)', border: `1px solid ${T.borderStrong}`, borderRadius: 12, padding: '13px 20px', color: T.textMuted, fontSize: 14, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
-              ⬆ Import CSV
+              ⬆ CSV
             </button>
             <button onClick={() => setShowLeadModal(true)} style={{ background: T.accent, border: 'none', borderRadius: 12, padding: '13px 24px', color: '#000', fontSize: 14, fontWeight: 800, cursor: 'pointer' }}>
               + Add Lead
@@ -640,7 +729,18 @@ export default function AdminPage() {
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16, marginBottom: 28 }}>
+        {hasLocalLeads && (
+          <div style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.3)', borderRadius: 12, padding: '14px 18px', marginBottom: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+            <div style={{ fontSize: 13, color: T.accentText }}>
+              Local leads found on this device — migrate them to the cloud so they appear everywhere.
+            </div>
+            <button onClick={migrateLocalLeads} style={{ background: T.accent, border: 'none', borderRadius: 8, padding: '8px 18px', color: '#000', fontSize: 13, fontWeight: 800, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+              Migrate to Cloud →
+            </button>
+          </div>
+        )}
+
+        <div className="admin-kpis" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16, marginBottom: 28 }}>
           <KPI label="Pipeline Value" value={`$${pipelineValue.toLocaleString()}`} sub="projected MRR from leads" color="#F59E0B" icon="💼" />
           <KPI label="Active Leads"   value={activeLeads} sub={`${leads.length} total in pipeline`} color={T.accentText} icon="▷" />
           <KPI label="Deals Won"      value={wonLeads} sub={wonLeads > 0 ? `$${leads.filter(l=>l.stage==='won').reduce((s,l)=>s+l.value,0).toLocaleString()}/mo closed` : 'none yet'} color={T.success} icon="✓" />
@@ -753,8 +853,8 @@ export default function AdminPage() {
       <>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 36 }}>
           <div>
-            <div style={{ fontSize: 10, fontWeight: 700, color: T.accentText, letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 8, opacity: 0.75 }}>Submissions</div>
-            <h1 style={{ fontSize: 34, fontWeight: 900, margin: 0, letterSpacing: -1.2, lineHeight: 1.05 }}>Intakes</h1>
+            <div style={{ fontSize: 11, fontWeight: 700, color: T.textDim, letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 6 }}>Submissions</div>
+            <h1 style={{ fontSize: 32, fontWeight: 900, margin: 0, letterSpacing: -1 }}>Intakes</h1>
           </div>
           {pending.length > 0 && (
             <div style={{ background: T.errorDim, border: '1px solid rgba(239,68,68,0.25)', borderRadius: 10, padding: '10px 18px', fontSize: 13, fontWeight: 700, color: T.error }}>
@@ -850,14 +950,14 @@ export default function AdminPage() {
           <h1 style={{ fontSize: 32, fontWeight: 900, margin: 0, letterSpacing: -1 }}>Analytics</h1>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16, marginBottom: 28 }}>
+        <div className="admin-kpis" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16, marginBottom: 28 }}>
           <KPI label="MRR"                value={`$${mrr.toLocaleString()}`}  sub="monthly recurring"      color={T.accentText} icon="💰" />
           <KPI label="ARR"                value={`$${arr.toLocaleString()}`}  sub="annual run rate"         color="#F59E0B"      icon="📈" />
           <KPI label="Active Clients"     value={stats.active}               sub={`${stats.inactive} inactive`} color={T.success} icon="✓" />
           <KPI label="Avg / Client"       value={stats.active > 0 ? `$${Math.round(mrr / stats.active)}` : '—'} sub="per active client/mo" color="#8B5CF6" icon="⭐" />
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 20 }}>
+        <div className="admin-rev-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 20 }}>
           <div style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 16, padding: 28 }}>
             <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 24 }}>Plan Distribution</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
@@ -968,12 +1068,216 @@ export default function AdminPage() {
     )
   }
 
+  // ── Agency Site Editor ────────────────────────────────────────────────────
+  function renderAgency() {
+    const ag = agencyContent ?? DEFAULT_AGENCY
+    const set = (field: keyof AgencyContent, val: unknown) =>
+      setAgencyContent(prev => ({ ...(prev ?? DEFAULT_AGENCY), [field]: val } as AgencyContent))
+    const updatePlan = (i: number, key: string, val: unknown) => {
+      const plans = ag.pricing_plans.map((p, j) => j === i ? { ...p, [key]: val } : p)
+      set('pricing_plans', plans)
+    }
+    const inp: React.CSSProperties = {
+      width: '100%', boxSizing: 'border-box', background: T.input,
+      border: `1px solid ${T.border}`, borderRadius: 10,
+      padding: '11px 14px', color: T.text, fontSize: 14, outline: 'none', fontFamily: 'inherit',
+    }
+    const lbl: React.CSSProperties = {
+      display: 'block', fontSize: 11, fontWeight: 700,
+      color: T.textDim, letterSpacing: 0.5, marginBottom: 7,
+    }
+    const fg = (label: string, field: keyof AgencyContent, multiline = false) => (
+      <div>
+        <label style={lbl}>{label}</label>
+        {multiline
+          ? <textarea rows={3} value={String(ag[field])} onChange={e => set(field, e.target.value)} style={{ ...inp, resize: 'vertical', lineHeight: 1.6 }} />
+          : <input value={String(ag[field])} onChange={e => set(field, e.target.value)} style={inp} />
+        }
+      </div>
+    )
+
+    return (
+      <>
+        <div className="admin-section-hdr" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 32 }}>
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: T.textDim, letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 6 }}>Landing Page</div>
+            <h1 style={{ fontSize: 32, fontWeight: 900, margin: 0, letterSpacing: -1 }}>Agency Site</h1>
+          </div>
+          <div className="admin-header-actions" style={{ display: 'flex', gap: 10 }}>
+            <button onClick={() => window.open('/', '_blank')} style={{ background: 'rgba(255,255,255,0.06)', border: `1px solid ${T.borderStrong}`, borderRadius: 12, padding: '13px 20px', color: T.textMuted, fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+              Preview ↗
+            </button>
+            <button onClick={saveAgency} disabled={agencySaving} style={{ background: T.accent, border: 'none', borderRadius: 12, padding: '13px 28px', color: '#000', fontSize: 14, fontWeight: 800, cursor: 'pointer', opacity: agencySaving ? 0.7 : 1 }}>
+              {agencySaving ? 'Saving…' : 'Save Changes'}
+            </button>
+          </div>
+        </div>
+
+        {/* Tabs */}
+        <div style={{ display: 'flex', gap: 4, marginBottom: 28, background: T.card, borderRadius: 12, padding: 4, width: 'fit-content', border: `1px solid ${T.border}` }}>
+          {(['Branding', 'Hero', 'Stats', 'Sections', 'Pricing'] as const).map(t => (
+            <button key={t} onClick={() => setAgencyTab(t)} style={{
+              background: agencyTab === t ? T.bg : 'transparent',
+              border: `1px solid ${agencyTab === t ? T.borderStrong : 'transparent'}`,
+              borderRadius: 8, padding: '8px 16px',
+              color: agencyTab === t ? T.text : T.textMuted,
+              fontSize: 13, fontWeight: agencyTab === t ? 700 : 400, cursor: 'pointer',
+            }}>{t}</button>
+          ))}
+        </div>
+
+        <div style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 16, padding: 32 }}>
+
+          {agencyTab === 'Branding' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20, maxWidth: 560 }}>
+              {fg('Company Name', 'company_name')}
+              {fg('Logo Letters', 'logo_letters')}
+              {fg('Contact Email', 'contact_email')}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                <div>
+                  <label style={lbl}>Primary Color</label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <input type="color" value={ag.primary_color} onChange={e => set('primary_color', e.target.value)}
+                      style={{ width: 44, height: 44, border: `1px solid ${T.border}`, borderRadius: 8, background: 'none', cursor: 'pointer', padding: 2, flexShrink: 0 }} />
+                    <input value={ag.primary_color} onChange={e => set('primary_color', e.target.value)} style={{ ...inp }} placeholder="#F59E0B" />
+                  </div>
+                </div>
+                <div>
+                  <label style={lbl}>Accent Color</label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <input type="color" value={ag.accent_color} onChange={e => set('accent_color', e.target.value)}
+                      style={{ width: 44, height: 44, border: `1px solid ${T.border}`, borderRadius: 8, background: 'none', cursor: 'pointer', padding: 2, flexShrink: 0 }} />
+                    <input value={ag.accent_color} onChange={e => set('accent_color', e.target.value)} style={{ ...inp }} placeholder="#FCD34D" />
+                  </div>
+                </div>
+              </div>
+              <div style={{ background: T.accentDim, border: `1px solid ${T.accentBorder}`, borderRadius: 10, padding: '12px 16px', fontSize: 12, color: T.accentText }}>
+                Primary color updates your nav logo, hero badge, CTA buttons, and footer. Changes go live after you save.
+              </div>
+            </div>
+          )}
+
+          {agencyTab === 'Hero' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20, maxWidth: 560 }}>
+              {fg('Badge Text', 'hero_badge')}
+              {fg('Headline Line 1', 'hero_headline_1')}
+              {fg('Headline Line 2 (shown dim)', 'hero_headline_2')}
+              {fg('Subtitle', 'hero_subtitle', true)}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                {fg('Primary CTA Button', 'hero_cta_primary')}
+                {fg('Secondary CTA Button', 'hero_cta_secondary')}
+              </div>
+            </div>
+          )}
+
+          {agencyTab === 'Stats' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 560 }}>
+              <div style={{ fontSize: 13, color: T.textMuted, marginBottom: 4 }}>The 4 stats shown below your hero section.</div>
+              {([
+                { n: 1, val: ag.stat_1_val, label: ag.stat_1_label, vk: 'stat_1_val' as const, lk: 'stat_1_label' as const },
+                { n: 2, val: ag.stat_2_val, label: ag.stat_2_label, vk: 'stat_2_val' as const, lk: 'stat_2_label' as const },
+                { n: 3, val: ag.stat_3_val, label: ag.stat_3_label, vk: 'stat_3_val' as const, lk: 'stat_3_label' as const },
+                { n: 4, val: ag.stat_4_val, label: ag.stat_4_label, vk: 'stat_4_val' as const, lk: 'stat_4_label' as const },
+              ]).map(({ n, val, label, vk, lk }) => (
+                <div key={n} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                  <div>
+                    <label style={lbl}>Stat {n} — Value</label>
+                    <input value={val} onChange={e => set(vk, e.target.value)} style={inp} />
+                  </div>
+                  <div>
+                    <label style={lbl}>Stat {n} — Label</label>
+                    <input value={label} onChange={e => set(lk, e.target.value)} style={inp} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {agencyTab === 'Sections' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20, maxWidth: 560 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: T.textMuted }}>Section Headings</div>
+              {fg('Process Section Title', 'process_title')}
+              {fg('Services Section Title', 'services_title')}
+              <div style={{ height: 1, background: T.border }} />
+              <div style={{ fontSize: 13, fontWeight: 700, color: T.textMuted }}>Pricing Section</div>
+              {fg('Pricing Title', 'pricing_title')}
+              {fg('Pricing Subtitle', 'pricing_subtitle')}
+              <div style={{ height: 1, background: T.border }} />
+              <div style={{ fontSize: 13, fontWeight: 700, color: T.textMuted }}>Call-to-Action</div>
+              {fg('CTA Title', 'cta_title')}
+              {fg('CTA Subtitle', 'cta_subtitle', true)}
+              {fg('CTA Button Text', 'cta_button')}
+              <div style={{ height: 1, background: T.border }} />
+              {fg('Footer Copyright', 'footer_copyright')}
+            </div>
+          )}
+
+          {agencyTab === 'Pricing' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+              {ag.pricing_plans.map((plan, i) => (
+                <div key={i} style={{ background: T.cardAlt, border: `1px solid ${T.border}`, borderRadius: 14, padding: 24 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+                    <div style={{ fontSize: 14, fontWeight: 800 }}>Plan {i + 1}</div>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13, color: T.textMuted }}>
+                      <input
+                        type="checkbox"
+                        checked={plan.highlight}
+                        onChange={e => {
+                          const plans = ag.pricing_plans.map((p, j) => ({ ...p, highlight: j === i ? e.target.checked : false }))
+                          set('pricing_plans', plans)
+                        }}
+                      />
+                      Highlight as &ldquo;Most Popular&rdquo;
+                    </label>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
+                    <div>
+                      <label style={lbl}>Name</label>
+                      <input value={plan.name} onChange={e => updatePlan(i, 'name', e.target.value)} style={inp} />
+                    </div>
+                    <div>
+                      <label style={lbl}>Setup Price</label>
+                      <input value={plan.price} onChange={e => updatePlan(i, 'price', e.target.value)} style={inp} placeholder="$999" />
+                    </div>
+                    <div>
+                      <label style={lbl}>Monthly (leave blank for none)</label>
+                      <input value={plan.monthly ?? ''} onChange={e => updatePlan(i, 'monthly', e.target.value || null)} style={inp} placeholder="$149/mo" />
+                    </div>
+                    <div>
+                      <label style={lbl}>Description</label>
+                      <input value={plan.desc} onChange={e => updatePlan(i, 'desc', e.target.value)} style={inp} />
+                    </div>
+                  </div>
+                  <div>
+                    <label style={lbl}>Features (one per line)</label>
+                    <textarea
+                      rows={5}
+                      value={plan.features.join('\n')}
+                      onChange={e => updatePlan(i, 'features', e.target.value.split('\n').filter(f => f.trim()))}
+                      style={{ ...inp, resize: 'vertical', lineHeight: 1.7 }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+        </div>
+      </>
+    )
+  }
+
   // ── Shell ─────────────────────────────────────────────────────────────────
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: T.bg, color: T.text, fontFamily: 'var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' }}>
 
+      {/* ── Mobile overlay ── */}
+      {mobileNavOpen && (
+        <div onClick={() => setMobileNavOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)', zIndex: 99 }} />
+      )}
+
       {/* ── Sidebar ── */}
-      <div style={{ width: 240, background: T.sidebar, borderRight: `1px solid ${T.border}`, display: 'flex', flexDirection: 'column', position: 'fixed', top: 0, bottom: 0, left: 0, zIndex: 100 }}>
+      <div className={`admin-sidebar${mobileNavOpen ? ' open' : ''}`} style={{ width: 240, background: T.sidebar, borderRight: `1px solid ${T.border}`, display: 'flex', flexDirection: 'column', position: 'fixed', top: 0, bottom: 0, left: 0, zIndex: 100 }}>
         {/* Logo — click to open landing page */}
         <div style={{ padding: '28px 20px 24px' }}>
           <div
@@ -981,7 +1285,7 @@ export default function AdminPage() {
             title="View landing page"
             style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}
           >
-            <div style={{ width: 38, height: 38, background: T.accent, borderRadius: 11, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 14, color: '#000', flexShrink: 0, boxShadow: `0 0 18px rgba(245,158,11,0.35)` }}>MJ</div>
+            <div style={{ width: 38, height: 38, background: T.accent, borderRadius: 11, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 14, color: '#000', flexShrink: 0 }}>MJ</div>
             <div>
               <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: 0.5 }}>MJ AGENCY</div>
               <div style={{ fontSize: 10, color: T.accentText, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase' }}>Admin</div>
@@ -997,7 +1301,7 @@ export default function AdminPage() {
             return (
               <div
                 key={item.label}
-                onClick={() => setSection(item.label)}
+                onClick={() => { setSection(item.label); setMobileNavOpen(false) }}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px',
                   borderRadius: 10, marginBottom: 2,
@@ -1044,14 +1348,22 @@ export default function AdminPage() {
       </div>
 
       {/* ── Main content ── */}
-      <div style={{ flex: 1, marginLeft: 240, padding: '48px 56px', overflowY: 'auto', minHeight: '100vh', backgroundImage: 'linear-gradient(rgba(255,255,255,0.01) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.01) 1px, transparent 1px)', backgroundSize: '80px 80px', position: 'relative' }}>
-        <div style={{ position: 'fixed', top: -300, left: '50%', transform: 'translateX(-50%)', width: 800, height: 500, background: 'radial-gradient(ellipse, rgba(245,158,11,0.04) 0%, transparent 60%)', pointerEvents: 'none', zIndex: 0 }} />
+      <div className="admin-main" style={{ flex: 1, marginLeft: 240, padding: '44px 52px', overflowY: 'auto', minHeight: '100vh', backgroundImage: 'linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px)', backgroundSize: '72px 72px' }}>
+        {/* Mobile hamburger */}
+        <button
+          className="admin-hamburger"
+          onClick={() => setMobileNavOpen(o => !o)}
+          style={{ display: 'none', alignItems: 'center', gap: 10, background: T.card, border: `1px solid ${T.border}`, borderRadius: 10, padding: '10px 16px', color: T.text, fontSize: 13, fontWeight: 700, cursor: 'pointer', marginBottom: 24, fontFamily: 'inherit' }}
+        >
+          <span style={{ fontSize: 16 }}>☰</span> Menu
+        </button>
         {section === 'Dashboard' && renderDashboard()}
         {section === 'Clients'   && renderClients()}
         {section === 'Pipeline'  && renderPipeline()}
         {section === 'Intakes'   && renderIntakes()}
         {section === 'Analytics' && renderAnalytics()}
         {section === 'Settings'  && renderSettings()}
+        {section === 'Agency'    && renderAgency()}
       </div>
 
       {/* ── Add Client Modal ── */}
@@ -1324,6 +1636,18 @@ export default function AdminPage() {
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.14); }
+        @media (max-width: 768px) {
+          .admin-sidebar { transform: translateX(-100%); transition: transform 0.22s ease; }
+          .admin-sidebar.open { transform: translateX(0) !important; }
+          .admin-main { margin-left: 0 !important; padding: 20px 16px 80px !important; }
+          .admin-hamburger { display: flex !important; }
+          .admin-kpis { grid-template-columns: repeat(2,1fr) !important; gap: 10px !important; }
+          .admin-rev-grid { grid-template-columns: 1fr !important; }
+          .admin-header-actions { flex-wrap: wrap !important; width: 100%; }
+          .admin-header-actions .admin-search-input { width: 100% !important; }
+          .admin-section-hdr { flex-direction: column !important; gap: 14px !important; margin-bottom: 24px !important; }
+          .admin-section-hdr h1 { font-size: 26px !important; }
+        }
       `}</style>
     </div>
   )

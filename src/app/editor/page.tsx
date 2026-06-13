@@ -170,7 +170,7 @@ function EditorInner() {
     <div style={{ display: 'flex', height: '100vh', background: '#080808', overflow: 'hidden', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' }}>
 
       {/* ── Sidebar ── */}
-      <div style={{ width: 256, background: '#070E1B', borderRight: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
+      <div className="ed-sidebar" style={{ width: 256, background: '#070E1B', borderRight: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
 
         {/* Brand header */}
         <div style={{ padding: '24px 20px 20px' }}>
@@ -251,15 +251,16 @@ function EditorInner() {
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
         {/* Top bar */}
-        <div style={{ background: '#070E1B', borderBottom: '1px solid rgba(255,255,255,0.05)', padding: '0 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: 60, flexShrink: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            <span style={{ fontSize: 18, color: brandColor, opacity: 0.7, fontWeight: 600 }}>{TAB_META[tab].icon}</span>
+        <div className="ed-topbar" style={{ background: '#070E1B', borderBottom: '1px solid rgba(255,255,255,0.05)', padding: '0 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: 60, flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            <span style={{ fontSize: 17, color: brandColor, opacity: 0.8, fontWeight: 600 }}>{TAB_META[tab].icon}</span>
             <div>
               <div style={{ fontSize: 15, fontWeight: 700, color: '#fff', letterSpacing: -0.2 }}>{tab}</div>
-              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', marginTop: 1 }}>{TAB_META[tab].desc}</div>
+              <div className="ed-topbar-desc" style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', marginTop: 1 }}>{TAB_META[tab].desc}</div>
             </div>
           </div>
           <button
+            className="ed-save-btn"
             onClick={saveContent}
             disabled={saving}
             style={{
@@ -277,7 +278,7 @@ function EditorInner() {
         </div>
 
         {/* Form panel */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '28px 32px' }}>
+        <div className="ed-form" style={{ flex: 1, overflowY: 'auto', padding: '28px 32px' }}>
           <div style={{ maxWidth: 700 }}>
 
             {/* ── BRANDING ── */}
@@ -293,7 +294,7 @@ function EditorInner() {
                 </SectionCard>
 
                 <SectionCard title="Colors" desc="Pick your primary and accent brand colors">
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
+                  <div className="ed-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
                     <Field label="Primary">
                       <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                         <div style={{ position: 'relative', width: 42, height: 42, flexShrink: 0 }}>
@@ -352,7 +353,7 @@ function EditorInner() {
             {/* ── PRODUCTS ── */}
             {tab === 'Products' && (
               <>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                <div className="ed-prod-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                   <div>
                     <div style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>Product Catalogue</div>
                     <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', marginTop: 3 }}>{products.length} {products.length === 1 ? 'product' : 'products'}</div>
@@ -374,12 +375,12 @@ function EditorInner() {
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                     {products.map(p => (
-                      <div key={p.id} style={{ background: '#0A1020', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 14, padding: '14px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16 }}>
+                      <div key={p.id} style={{ background: '#0A1020', border: `1px solid ${brandColor}18`, borderRadius: 14, padding: '14px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                          <div style={{ width: 44, height: 44, borderRadius: 10, background: '#060D1A', border: '1px solid rgba(255,255,255,0.06)', flexShrink: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>
+                          <div style={{ width: 44, height: 44, borderRadius: 10, background: `${brandColor}18`, border: `1px solid ${brandColor}30`, flexShrink: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>
                             {p.image_url
                               ? <img src={p.image_url} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                              : '▦'
+                              : <span style={{ color: brandColor, opacity: 0.7 }}>▦</span>
                             }
                           </div>
                           <div>
@@ -411,7 +412,7 @@ function EditorInner() {
                 </SectionCard>
 
                 <SectionCard title="Stats" desc="4 numbers that show your track record">
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                  <div className="ed-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                     {[
                       { key: 'stat_founded', label: 'Founded', placeholder: 'e.g. 2020' },
                       { key: 'stat_customers', label: 'Customers', placeholder: 'e.g. 10K+' },
@@ -505,7 +506,7 @@ function EditorInner() {
             <Field label="Product Name">
               <input style={inp()} value={editingProduct.name || ''} onChange={e => setEditingProduct(p => ({ ...p!, name: e.target.value }))} placeholder="e.g. Whey Gold Isolate" />
             </Field>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+            <div className="ed-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
               <Field label="Category">
                 <input style={inp()} value={editingProduct.category || ''} onChange={e => setEditingProduct(p => ({ ...p!, category: e.target.value }))} placeholder="e.g. Protein" />
               </Field>
@@ -523,7 +524,7 @@ function EditorInner() {
             <div style={{ background: '#060D1A', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12, padding: '16px', marginBottom: 18 }}>
               <div style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.4)', marginBottom: 14 }}>Key Stats — 3 highlights (e.g. 30g Protein, 150 Calories)</div>
               {([1, 2, 3] as const).map(n => (
-                <div key={n} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: n < 3 ? 12 : 0 }}>
+                <div key={n} className="ed-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: n < 3 ? 12 : 0 }}>
                   <Field label={`Stat ${n} — Value`}>
                     <input style={inp({ marginBottom: 0 })} value={editingProduct[`stat${n}_val` as keyof Product] as string || ''} onChange={e => setEditingProduct(p => ({ ...p!, [`stat${n}_val`]: e.target.value }))} placeholder="e.g. 30g" />
                   </Field>
@@ -542,17 +543,56 @@ function EditorInner() {
         </div>
       )}
 
+      {/* ── Mobile bottom tab bar ── */}
+      <div className="ed-bottom-tabs" style={{
+        display: 'none', position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 50,
+        background: '#070E1B', borderTop: '1px solid rgba(255,255,255,0.07)',
+        paddingBottom: 'env(safe-area-inset-bottom)',
+      }}>
+        {TABS.map(t => {
+          const active = tab === t
+          return (
+            <button
+              key={t}
+              onClick={() => setTab(t)}
+              style={{
+                flex: 1, background: 'none', border: 'none',
+                color: active ? brandColor : 'rgba(255,255,255,0.3)',
+                cursor: 'pointer', padding: '10px 4px 12px',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+                fontFamily: 'inherit', borderTop: `2px solid ${active ? brandColor : 'transparent'}`,
+                transition: 'color 0.15s',
+              }}
+            >
+              <span style={{ fontSize: 16, lineHeight: 1 }}>{TAB_META[t].icon}</span>
+              <span style={{ fontSize: 9, fontWeight: active ? 700 : 500, letterSpacing: 0.5, textTransform: 'uppercase' }}>{t}</span>
+            </button>
+          )
+        })}
+      </div>
+
       {/* Toast */}
       {toast && (
-        <div style={{ position: 'fixed', bottom: 24, right: 24, background: '#0A1020', border: '1px solid rgba(14,165,233,0.3)', borderRadius: 10, padding: '12px 20px', fontSize: 13, fontWeight: 600, zIndex: 2000, boxShadow: '0 8px 32px rgba(0,0,0,0.6)', color: '#fff' }}>
+        <div style={{ position: 'fixed', bottom: 80, right: 16, background: '#0A1020', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 10, padding: '12px 18px', fontSize: 13, fontWeight: 600, zIndex: 2000, boxShadow: '0 8px 32px rgba(0,0,0,0.6)', color: '#fff' }}>
           {toast}
         </div>
       )}
 
       <style>{`
-        input:focus, textarea:focus { border-color: rgba(14,165,233,0.4) !important; }
+        input:focus, textarea:focus { border-color: ${brandColor}66 !important; }
         * { -webkit-font-smoothing: antialiased; box-sizing: border-box; }
         ::-webkit-scrollbar { width: 5px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
+        @media (max-width: 768px) {
+          .ed-sidebar { display: none !important; }
+          .ed-topbar { padding: 0 16px !important; }
+          .ed-topbar-desc { display: none !important; }
+          .ed-save-btn { padding: 9px 16px !important; min-width: unset !important; font-size: 13px !important; }
+          .ed-form { padding: 20px 16px 96px !important; }
+          .ed-2col { grid-template-columns: 1fr !important; }
+          .ed-bottom-tabs { display: flex !important; }
+          .ed-prod-header { flex-wrap: wrap !important; gap: 12px !important; }
+          .ed-prod-header button { width: 100% !important; }
+        }
       `}</style>
     </div>
   )
