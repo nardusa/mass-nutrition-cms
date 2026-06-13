@@ -6,15 +6,15 @@ import { supabase, type Client } from '@/lib/supabase'
 
 // ── Theme ────────────────────────────────────────────────────────────────────
 const T = {
-  bg:           '#0A0A0A',
-  sidebar:      '#111111',
-  card:         '#141414',
-  cardAlt:      '#0F0F0F',
-  border:       'rgba(255,255,255,0.06)',
-  borderStrong: 'rgba(255,255,255,0.1)',
+  bg:           '#070707',
+  sidebar:      '#0A0A0A',
+  card:         '#0E0E0E',
+  cardAlt:      '#0B0B0B',
+  border:       'rgba(255,255,255,0.05)',
+  borderStrong: 'rgba(255,255,255,0.09)',
   accent:       '#F59E0B',
   accentDim:    'rgba(245,158,11,0.1)',
-  accentBorder: 'rgba(245,158,11,0.25)',
+  accentBorder: 'rgba(245,158,11,0.22)',
   accentText:   '#FCD34D',
   success:      '#10B981',
   successDim:   'rgba(16,185,129,0.1)',
@@ -23,9 +23,9 @@ const T = {
   errorDim:     'rgba(239,68,68,0.08)',
   purple:       '#8B5CF6',
   text:         '#fff',
-  textMuted:    'rgba(255,255,255,0.5)',
-  textDim:      'rgba(255,255,255,0.25)',
-  input:        '#0A0A0A',
+  textMuted:    'rgba(255,255,255,0.45)',
+  textDim:      'rgba(255,255,255,0.22)',
+  input:        '#070707',
 }
 
 // ── Config ───────────────────────────────────────────────────────────────────
@@ -404,13 +404,16 @@ export default function AdminPage() {
   // ── KPI Card ──────────────────────────────────────────────────────────────
   function KPI({ label, value, sub, color, icon }: { label: string; value: string | number; sub?: string; color?: string; icon: string }) {
     return (
-      <div style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 16, padding: 24 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
-          <span style={{ fontSize: 11, fontWeight: 600, color: T.textMuted, letterSpacing: 0.5, textTransform: 'uppercase' }}>{label}</span>
-          <span style={{ fontSize: 22, lineHeight: 1 }}>{icon}</span>
+      <div style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 16, overflow: 'hidden', boxShadow: color === T.accentText ? `0 4px 20px rgba(245,158,11,0.08)` : 'none' }}>
+        <div style={{ height: 2, background: color ? `linear-gradient(90deg, ${color}60, transparent)` : `linear-gradient(90deg, rgba(255,255,255,0.06), transparent)` }} />
+        <div style={{ padding: 24 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
+            <span style={{ fontSize: 10, fontWeight: 700, color: T.textDim, letterSpacing: 1.2, textTransform: 'uppercase' }}>{label}</span>
+            <span style={{ fontSize: 18, lineHeight: 1, opacity: 0.7 }}>{icon}</span>
+          </div>
+          <div style={{ fontSize: 36, fontWeight: 900, color: color || T.text, lineHeight: 1, letterSpacing: -1.5 }}>{value}</div>
+          {sub && <div style={{ fontSize: 11, color: T.textDim, marginTop: 8, fontWeight: 500 }}>{sub}</div>}
         </div>
-        <div style={{ fontSize: 34, fontWeight: 900, color: color || T.text, lineHeight: 1, letterSpacing: -1 }}>{value}</div>
-        {sub && <div style={{ fontSize: 12, color: T.textDim, marginTop: 6 }}>{sub}</div>}
       </div>
     )
   }
@@ -421,8 +424,8 @@ export default function AdminPage() {
       <>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 36 }}>
           <div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: T.textDim, letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 6 }}>Overview</div>
-            <h1 style={{ fontSize: 32, fontWeight: 900, margin: 0, letterSpacing: -1 }}>Dashboard</h1>
+            <div style={{ fontSize: 10, fontWeight: 700, color: T.accentText, letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 8, opacity: 0.75 }}>Overview</div>
+            <h1 style={{ fontSize: 34, fontWeight: 900, margin: 0, letterSpacing: -1.2, lineHeight: 1.05 }}>Dashboard</h1>
           </div>
           <button onClick={() => setShowModal(true)} style={{ background: T.accent, border: 'none', borderRadius: 12, padding: '13px 24px', color: '#000', fontSize: 14, fontWeight: 800, cursor: 'pointer' }}>
             + Add Client
@@ -541,8 +544,8 @@ export default function AdminPage() {
       <>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 36 }}>
           <div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: T.textDim, letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 6 }}>Management</div>
-            <h1 style={{ fontSize: 32, fontWeight: 900, margin: 0, letterSpacing: -1 }}>Clients</h1>
+            <div style={{ fontSize: 10, fontWeight: 700, color: T.accentText, letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 8, opacity: 0.75 }}>Management</div>
+            <h1 style={{ fontSize: 34, fontWeight: 900, margin: 0, letterSpacing: -1.2, lineHeight: 1.05 }}>Clients</h1>
           </div>
           <div style={{ display: 'flex', gap: 12 }}>
             <div style={{ position: 'relative' }}>
@@ -624,8 +627,8 @@ export default function AdminPage() {
       <>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 36 }}>
           <div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: T.textDim, letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 6 }}>Sales</div>
-            <h1 style={{ fontSize: 32, fontWeight: 900, margin: 0, letterSpacing: -1 }}>Pipeline</h1>
+            <div style={{ fontSize: 10, fontWeight: 700, color: T.accentText, letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 8, opacity: 0.75 }}>Sales</div>
+            <h1 style={{ fontSize: 34, fontWeight: 900, margin: 0, letterSpacing: -1.2, lineHeight: 1.05 }}>Pipeline</h1>
           </div>
           <div style={{ display: 'flex', gap: 10 }}>
             <button onClick={() => fileInputRef.current?.click()} style={{ background: 'rgba(255,255,255,0.06)', border: `1px solid ${T.borderStrong}`, borderRadius: 12, padding: '13px 20px', color: T.textMuted, fontSize: 14, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -750,8 +753,8 @@ export default function AdminPage() {
       <>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 36 }}>
           <div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: T.textDim, letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 6 }}>Submissions</div>
-            <h1 style={{ fontSize: 32, fontWeight: 900, margin: 0, letterSpacing: -1 }}>Intakes</h1>
+            <div style={{ fontSize: 10, fontWeight: 700, color: T.accentText, letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 8, opacity: 0.75 }}>Submissions</div>
+            <h1 style={{ fontSize: 34, fontWeight: 900, margin: 0, letterSpacing: -1.2, lineHeight: 1.05 }}>Intakes</h1>
           </div>
           {pending.length > 0 && (
             <div style={{ background: T.errorDim, border: '1px solid rgba(239,68,68,0.25)', borderRadius: 10, padding: '10px 18px', fontSize: 13, fontWeight: 700, color: T.error }}>
@@ -978,7 +981,7 @@ export default function AdminPage() {
             title="View landing page"
             style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}
           >
-            <div style={{ width: 38, height: 38, background: T.accent, borderRadius: 11, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 14, color: '#000', flexShrink: 0 }}>MJ</div>
+            <div style={{ width: 38, height: 38, background: T.accent, borderRadius: 11, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 14, color: '#000', flexShrink: 0, boxShadow: `0 0 18px rgba(245,158,11,0.35)` }}>MJ</div>
             <div>
               <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: 0.5 }}>MJ AGENCY</div>
               <div style={{ fontSize: 10, color: T.accentText, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase' }}>Admin</div>
@@ -1041,7 +1044,8 @@ export default function AdminPage() {
       </div>
 
       {/* ── Main content ── */}
-      <div style={{ flex: 1, marginLeft: 240, padding: '44px 52px', overflowY: 'auto', minHeight: '100vh', backgroundImage: 'linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px)', backgroundSize: '72px 72px' }}>
+      <div style={{ flex: 1, marginLeft: 240, padding: '48px 56px', overflowY: 'auto', minHeight: '100vh', backgroundImage: 'linear-gradient(rgba(255,255,255,0.01) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.01) 1px, transparent 1px)', backgroundSize: '80px 80px', position: 'relative' }}>
+        <div style={{ position: 'fixed', top: -300, left: '50%', transform: 'translateX(-50%)', width: 800, height: 500, background: 'radial-gradient(ellipse, rgba(245,158,11,0.04) 0%, transparent 60%)', pointerEvents: 'none', zIndex: 0 }} />
         {section === 'Dashboard' && renderDashboard()}
         {section === 'Clients'   && renderClients()}
         {section === 'Pipeline'  && renderPipeline()}
