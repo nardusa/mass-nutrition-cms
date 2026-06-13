@@ -494,14 +494,18 @@ export default function AdminPage() {
 
   // ── KPI Card ──────────────────────────────────────────────────────────────
   function KPI({ label, value, sub, color, icon }: { label: string; value: string | number; sub?: string; color?: string; icon: string }) {
+    const c = color || T.text
     return (
-      <div style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 16, padding: 24 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
-          <span style={{ fontSize: 11, fontWeight: 600, color: T.textMuted, letterSpacing: 0.5, textTransform: 'uppercase' }}>{label}</span>
-          <span style={{ fontSize: 22, lineHeight: 1 }}>{icon}</span>
+      <div style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 16, overflow: 'hidden' }}>
+        <div style={{ height: 3, background: `linear-gradient(90deg, ${c}80, ${c}20)` }} />
+        <div style={{ padding: 24 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
+            <span style={{ fontSize: 11, fontWeight: 600, color: T.textMuted, letterSpacing: 0.5, textTransform: 'uppercase' }}>{label}</span>
+            <span style={{ fontSize: 22, lineHeight: 1 }}>{icon}</span>
+          </div>
+          <div style={{ fontSize: 34, fontWeight: 900, color: c, lineHeight: 1, letterSpacing: -1 }}>{value}</div>
+          {sub && <div style={{ fontSize: 12, color: T.textDim, marginTop: 6 }}>{sub}</div>}
         </div>
-        <div style={{ fontSize: 34, fontWeight: 900, color: color || T.text, lineHeight: 1, letterSpacing: -1 }}>{value}</div>
-        {sub && <div style={{ fontSize: 12, color: T.textDim, marginTop: 6 }}>{sub}</div>}
       </div>
     )
   }
@@ -512,7 +516,7 @@ export default function AdminPage() {
       <>
         <div className="admin-section-hdr" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 36 }}>
           <div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: T.textDim, letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 6 }}>Overview</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: T.accentText, letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 6 }}>Overview</div>
             <h1 style={{ fontSize: 32, fontWeight: 900, margin: 0, letterSpacing: -1 }}>Dashboard</h1>
           </div>
           <button onClick={() => setShowModal(true)} style={{ background: T.accent, border: 'none', borderRadius: 12, padding: '13px 24px', color: '#000', fontSize: 14, fontWeight: 800, cursor: 'pointer' }}>
@@ -632,7 +636,7 @@ export default function AdminPage() {
       <>
         <div className="admin-section-hdr" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 36 }}>
           <div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: T.textDim, letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 6 }}>Management</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: T.accentText, letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 6 }}>Management</div>
             <h1 style={{ fontSize: 32, fontWeight: 900, margin: 0, letterSpacing: -1 }}>Clients</h1>
           </div>
           <div className="admin-header-actions" style={{ display: 'flex', gap: 10 }}>
@@ -716,7 +720,7 @@ export default function AdminPage() {
       <>
         <div className="admin-section-hdr" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 36 }}>
           <div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: T.textDim, letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 6 }}>Sales</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: T.accentText, letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 6 }}>Sales</div>
             <h1 style={{ fontSize: 32, fontWeight: 900, margin: 0, letterSpacing: -1 }}>Pipeline</h1>
           </div>
           <div className="admin-header-actions" style={{ display: 'flex', gap: 10 }}>
@@ -853,7 +857,7 @@ export default function AdminPage() {
       <>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 36 }}>
           <div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: T.textDim, letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 6 }}>Submissions</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: T.accentText, letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 6 }}>Submissions</div>
             <h1 style={{ fontSize: 32, fontWeight: 900, margin: 0, letterSpacing: -1 }}>Intakes</h1>
           </div>
           {pending.length > 0 && (
@@ -946,7 +950,7 @@ export default function AdminPage() {
     return (
       <>
         <div style={{ marginBottom: 36 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: T.textDim, letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 6 }}>Growth</div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: T.accentText, letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 6 }}>Growth</div>
           <h1 style={{ fontSize: 32, fontWeight: 900, margin: 0, letterSpacing: -1 }}>Analytics</h1>
         </div>
 
@@ -1007,7 +1011,7 @@ export default function AdminPage() {
     return (
       <>
         <div style={{ marginBottom: 36 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: T.textDim, letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 6 }}>Configuration</div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: T.accentText, letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 6 }}>Configuration</div>
           <h1 style={{ fontSize: 32, fontWeight: 900, margin: 0, letterSpacing: -1 }}>Settings</h1>
         </div>
 
@@ -1100,7 +1104,7 @@ export default function AdminPage() {
       <>
         <div className="admin-section-hdr" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 32 }}>
           <div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: T.textDim, letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 6 }}>Landing Page</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: T.accentText, letterSpacing: 2.5, textTransform: 'uppercase', marginBottom: 6 }}>Landing Page</div>
             <h1 style={{ fontSize: 32, fontWeight: 900, margin: 0, letterSpacing: -1 }}>Agency Site</h1>
           </div>
           <div className="admin-header-actions" style={{ display: 'flex', gap: 10 }}>
@@ -1285,7 +1289,7 @@ export default function AdminPage() {
             title="View landing page"
             style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}
           >
-            <div style={{ width: 38, height: 38, background: T.accent, borderRadius: 11, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 14, color: '#000', flexShrink: 0 }}>MJ</div>
+            <div style={{ width: 38, height: 38, background: T.accent, borderRadius: 11, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 14, color: '#000', flexShrink: 0, boxShadow: `0 0 18px rgba(245,158,11,0.35)` }}>MJ</div>
             <div>
               <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: 0.5 }}>MJ AGENCY</div>
               <div style={{ fontSize: 10, color: T.accentText, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase' }}>Admin</div>
@@ -1348,7 +1352,9 @@ export default function AdminPage() {
       </div>
 
       {/* ── Main content ── */}
-      <div className="admin-main" style={{ flex: 1, marginLeft: 240, padding: '44px 52px', overflowY: 'auto', minHeight: '100vh', backgroundImage: 'linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px)', backgroundSize: '72px 72px' }}>
+      <div className="admin-main" style={{ flex: 1, marginLeft: 240, padding: '44px 52px', overflowY: 'auto', minHeight: '100vh', backgroundImage: 'linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px)', backgroundSize: '72px 72px', position: 'relative' }}>
+        <div style={{ position: 'fixed', top: 0, right: 0, width: 600, height: 600, background: 'radial-gradient(ellipse at 100% 0%, rgba(245,158,11,0.04) 0%, transparent 60%)', pointerEvents: 'none', zIndex: 0 }} />
+        <div style={{ position: 'relative', zIndex: 1 }}>
         {/* Mobile hamburger */}
         <button
           className="admin-hamburger"
@@ -1364,6 +1370,7 @@ export default function AdminPage() {
         {section === 'Analytics' && renderAnalytics()}
         {section === 'Settings'  && renderSettings()}
         {section === 'Agency'    && renderAgency()}
+        </div>
       </div>
 
       {/* ── Add Client Modal ── */}

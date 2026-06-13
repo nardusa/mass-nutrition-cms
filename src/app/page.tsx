@@ -102,7 +102,7 @@ export default async function HomePage() {
 
       {/* Hero */}
       <section className="lp-hero" style={{ position: 'relative', zIndex: 1, padding: '120px 40px 100px', maxWidth: 1100, margin: '0 auto', textAlign: 'center' }}>
-        <div style={{ position: 'absolute', top: -60, left: '50%', transform: 'translateX(-50%)', width: 900, height: 700, background: 'radial-gradient(ellipse, rgba(255,255,255,0.03) 0%, transparent 65%)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', top: -60, left: '50%', transform: 'translateX(-50%)', width: 900, height: 700, background: `radial-gradient(ellipse, ${primary}0A 0%, transparent 65%)`, pointerEvents: 'none' }} />
 
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 100, padding: '6px 16px', fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.7)', letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 36 }}>
           <span style={{ width: 6, height: 6, background: primary, borderRadius: '50%', display: 'inline-block' }} />
@@ -133,7 +133,7 @@ export default async function HomePage() {
         <div className="lp-stats-inner" style={{ maxWidth: 900, margin: '0 auto', padding: '40px', display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', gap: 32 }}>
           {stats.map(s => (
             <div key={s.label} style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: 26, fontWeight: 900, color: '#fff', letterSpacing: -0.5 }}>{s.val}</div>
+              <div style={{ fontSize: 26, fontWeight: 900, color: primary, letterSpacing: -0.5 }}>{s.val}</div>
               <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', fontWeight: 600, marginTop: 4, textTransform: 'uppercase', letterSpacing: 1 }}>{s.label}</div>
             </div>
           ))}
@@ -173,8 +173,9 @@ export default async function HomePage() {
             { title: 'Content Dashboard', desc: "Log in and update your own site. Change prices, swap photos, update hours. You're always in control.", tag: 'Your CMS' },
             { title: 'Ongoing Support', desc: "We're reachable by message, not a support ticket system. Real help from the people who built your site.", tag: 'Support' },
           ].map(s => (
-            <div key={s.title} style={{ background: '#0F0F0F', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 16, padding: '36px 32px' }}>
-              <div style={{ display: 'inline-block', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 6, padding: '4px 10px', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 20 }}>{s.tag}</div>
+            <div key={s.title} style={{ background: '#0F0F0F', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 16, padding: '36px 32px', position: 'relative', overflow: 'hidden' }}>
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg, ${primary}80, ${primary}20)` }} />
+              <div style={{ display: 'inline-block', background: `${primary}12`, border: `1px solid ${primary}30`, borderRadius: 6, padding: '4px 10px', fontSize: 11, fontWeight: 700, color: primary, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 20 }}>{s.tag}</div>
               <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 12, letterSpacing: -0.3 }}>{s.title}</div>
               <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.4)', lineHeight: 1.8 }}>{s.desc}</div>
             </div>
@@ -254,8 +255,8 @@ export default async function HomePage() {
 
       {/* CTA */}
       <section className="lp-section" style={{ position: 'relative', zIndex: 1, padding: '0 40px 120px', maxWidth: 700, margin: '0 auto', textAlign: 'center' }}>
-        <div className="lp-cta-card" style={{ background: '#0F0F0F', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 24, padding: '72px 48px', position: 'relative', overflow: 'hidden' }}>
-          <div style={{ position: 'absolute', top: -80, left: '50%', transform: 'translateX(-50%)', width: 500, height: 300, background: 'radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%)', pointerEvents: 'none' }} />
+        <div className="lp-cta-card" style={{ background: '#0F0F0F', border: `1px solid ${primary}30`, borderRadius: 24, padding: '72px 48px', position: 'relative', overflow: 'hidden', boxShadow: `0 0 60px ${primary}10` }}>
+          <div style={{ position: 'absolute', top: -80, left: '50%', transform: 'translateX(-50%)', width: 500, height: 300, background: `radial-gradient(circle, ${primary}08 0%, transparent 70%)`, pointerEvents: 'none' }} />
           <div style={{ position: 'relative' }}>
             <h2 style={{ fontSize: 'clamp(26px, 4vw, 38px)', fontWeight: 900, marginBottom: 16, letterSpacing: -0.5, lineHeight: 1.2 }}>{ctaTitle}</h2>
             <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.4)', marginBottom: 40, lineHeight: 1.7, maxWidth: 440, margin: '0 auto 40px' }}>
